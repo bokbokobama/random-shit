@@ -1,65 +1,766 @@
-set DAYS := Mon Tue Wed Thu Fri;
-set TYPES := entree side milk;
-set ITEMS := StuffedCrustPizza SandwichTurkeyAndCheesePretzel SandwichPbjOnWw Cheeseburger DominosPizza
-	SaladGrilledChickenJrh ChickenDrumstick CornBread SandwichTunaSaladOnSub MiniPancakes
-	SausagePatties SandwichHamAndCheeseOnWw Rotini BeefMeatballs WarmGarlicBread SandwichDeliOnWw 
-	FrenchFries ChickenSaladSandwich 
 
-	SoupTomato SweetPotatoCrossTrax SaladTossMenu MixedFruitlightSyrup FreshFruitBasket
-	FruitJuicevariety Broccoli Applesauce HashBrownPatty WarmAppleSlices BeansGreen
-	PeachesInLightSyrup BakedBeans PearsCanLightSyrup
+Lab6.ipynb_
+Notebook unstarred
 
-	MilkChocolateFatFree MilkFatFree Milk1%LowFat MilkstrawberryFatFree;
+!pip install -q pyomo
+!apt-get install -y -qq glpk-utils
+!wget "https://raw.githubusercontent.com/bokbokobama/random-shit/main/lunchData.dat"
 
-param minItems
-param entreeCost := 2.40
+--2024-02-24 04:37:02--  https://raw.githubusercontent.com/bokbokobama/random-shit/main/lunchData.dat
+Resolving raw.githubusercontent.com (raw.githubusercontent.com)... 185.199.109.133, 185.199.110.133, 185.199.111.133, ...
+Connecting to raw.githubusercontent.com (raw.githubusercontent.com)|185.199.109.133|:443... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 2735 (2.7K) [text/plain]
+Saving to: ‘lunchData.dat.1’
 
-param minCalories := 876
-param minProtein := 52
-param minCalcium := 433
-param maxFatRatio := 3;
+lunchData.dat.1     100%[===================>]   2.67K  --.-KB/s    in 0s      
 
-param: 	minQty	maxQty 	freeQty price
-entree	1	-1	1	2.40
-side	1	-1	-1	0
-milk	1	-1	1	0.60
+2024-02-24 04:37:03 (37.5 MB/s) - ‘lunchData.dat.1’ saved [2735/2735]
 
-param: 				kcal	protein	calcium	fat	Mon	Tue	Wed	Thu	Fri course:=
-StuffedCrustPizza				404	18	297	17	1	0	0	0	0	entree
-SandwichTurkeyAndCheesePretzel	263	19	100	8	1	0	0	0	0	entree
-SandwichPbjOnWw					409	14	0	32	1	1	1	1	1	entree
-Cheeseburger					341	21	126	15	1	1	1	1	1	entree	
-DominosPizza					300	21	500	8	1	1	1	1	1	entree
-SaladGrilledChickenJrh			426	24	126	8	1	1	1	1	1	entree
-ChickenDrumstick				190	16	20	11	0	1	0	0	0	entree
-CornBread						265	3	38	7	0	1	0	0	0	entree
-SandwichTunaSaladOnSub			308	25	130	9	0	1	0	0	0	entree
-MiniPancakes					170	4	50	3	0	0	1	0	0	entree
-SausagePatties					180	12	24	14	0	0	1	0	0	entree
-SandwichHamAndCheeseOnWw		95	10	82	6	0	0	1	0	0	entree
-Rotini							143	6	22	3	0	0	0	1	0	entree
-BeefMeatballs					200	15	35	13	0	0	0	1	0	entree
-WarmGarlicBread					140	5	0	4	0	0	0	1	0	entree
-SandwichDeliOnWw				187	7	80	16	0	0	0	1	0	entree
-FrenchFries						132	2	0	5	0	0	0	0	1	entree
-ChickenSaladSandwich			419	21	121	18	0	0	0	0	1	entree
+3 Set Declarations
+    DAYS : Size=1, Index=None, Ordered=Insertion
+        Key  : Dimen : Domain : Size : Members
+        None :     1 :    Any :    5 : {'Mon', 'Tue', 'Wed', 'Thu', 'Fri'}
+    ITEMS : Size=1, Index=None, Ordered=Insertion
+        Key  : Dimen : Domain : Size : Members
+        None :     1 :    Any :   36 : {'StuffedCrustPizza', 'SandwichTurkeyAndCheesePretzel', 'SandwichPbjOnWw', 'Cheeseburger', 'DominosPizza', 'SaladGrilledChickenJrh', 'ChickenDrumstick', 'CornBread', 'SandwichTunaSaladOnSub', 'MiniPancakes', 'SausagePatties', 'SandwichHamAndCheeseOnWw', 'Rotini', 'BeefMeatballs', 'WarmGarlicBread', 'SandwichDeliOnWw', 'FrenchFries', 'ChickenSaladSandwich', 'SoupTomato', 'SweetPotatoCrossTrax', 'SaladTossMenu', 'MixedFruitlightSyrup', 'FreshFruitBasket', 'FruitJuicevariety', 'Broccoli', 'Applesauce', 'HashBrownPatty', 'WarmAppleSlices', 'BeansGreen', 'PeachesInLightSyrup', 'BakedBeans', 'PearsCanLightSyrup', 'MilkChocolateFatFree', 'MilkFatFree', 'Milk1PercentLowfat', 'MilkStrawberryFatFree'}
+    TYPES : Size=1, Index=None, Ordered=Insertion
+        Key  : Dimen : Domain : Size : Members
+        None :     1 :    Any :    3 : {'entree', 'side', 'milk'}
 
-SoupTomato						89	2	5	0	1	0	0	0	0	side
-SweetPotatoCrossTrax			180	1	20	9	1	0	0	0	0	side
-SaladTossMenu					10	1	14	0	1	1	1	1	1	side
-MixedFruitlightSyrup			82	1	7	0	1	0	0	0	0	side
-FreshFruitBasket				75	1	16	0	1	1	1	1	1	side
-FruitJuicevariety				69	0	0	0	1	1	1	1	1	side
-Broccoli						15	1	21	0	0	1	0	0	0	side
-Applesauce						114	1	76	0	0	0	1	0	0	side
-HashBrownPatty					120	2	0	7	0	0	1	0	0	side
-WarmAppleSlices					68	0	3	0	0	0	0	1	0	side
-BeansGreen						20	1	33	0	0	0	0	0	1	side
-PeachesInLightSyrup				81	1	5	0	0	0	0	0	1	side
-BakedBeans						128	7	39	0	0	0	0	0	0	side
-PearsCanLightSyrup				86	0	7	0	0	0	0	0	0	side
+15 Param Declarations
+    calcium : Size=36, Index=ITEMS, Domain=Any, Default=None, Mutable=False
+        Key                            : Value
+                            Applesauce :    76
+                            BakedBeans :    39
+                            BeansGreen :    33
+                         BeefMeatballs :    35
+                              Broccoli :    21
+                          Cheeseburger :   126
+                      ChickenDrumstick :    20
+                  ChickenSaladSandwich :   121
+                             CornBread :    38
+                          DominosPizza :   500
+                           FrenchFries :     0
+                      FreshFruitBasket :    16
+                     FruitJuicevariety :     0
+                        HashBrownPatty :     0
+                    Milk1PercentLowfat :   306
+                  MilkChocolateFatFree :   300
+                           MilkFatFree :   306
+                 MilkStrawberryFatFree :   300
+                          MiniPancakes :    50
+                  MixedFruitlightSyrup :     7
+                   PeachesInLightSyrup :     5
+                    PearsCanLightSyrup :     7
+                                Rotini :    22
+                SaladGrilledChickenJrh :   126
+                         SaladTossMenu :    14
+                      SandwichDeliOnWw :    80
+              SandwichHamAndCheeseOnWw :    82
+                       SandwichPbjOnWw :     0
+                SandwichTunaSaladOnSub :   130
+        SandwichTurkeyAndCheesePretzel :   100
+                        SausagePatties :    24
+                            SoupTomato :     5
+                     StuffedCrustPizza :   297
+                  SweetPotatoCrossTrax :    20
+                       WarmAppleSlices :     3
+                       WarmGarlicBread :     0
+    course : Size=36, Index=ITEMS, Domain=Any, Default=None, Mutable=False
+        Key                            : Value
+                            Applesauce :   side
+                            BakedBeans :   side
+                            BeansGreen :   side
+                         BeefMeatballs : entree
+                              Broccoli :   side
+                          Cheeseburger : entree
+                      ChickenDrumstick : entree
+                  ChickenSaladSandwich : entree
+                             CornBread : entree
+                          DominosPizza : entree
+                           FrenchFries : entree
+                      FreshFruitBasket :   side
+                     FruitJuicevariety :   side
+                        HashBrownPatty :   side
+                    Milk1PercentLowfat :   milk
+                  MilkChocolateFatFree :   milk
+                           MilkFatFree :   milk
+                 MilkStrawberryFatFree :   milk
+                          MiniPancakes : entree
+                  MixedFruitlightSyrup :   side
+                   PeachesInLightSyrup :   side
+                    PearsCanLightSyrup :   side
+                                Rotini : entree
+                SaladGrilledChickenJrh : entree
+                         SaladTossMenu :   side
+                      SandwichDeliOnWw : entree
+              SandwichHamAndCheeseOnWw : entree
+                       SandwichPbjOnWw : entree
+                SandwichTunaSaladOnSub : entree
+        SandwichTurkeyAndCheesePretzel : entree
+                        SausagePatties : entree
+                            SoupTomato :   side
+                     StuffedCrustPizza : entree
+                  SweetPotatoCrossTrax :   side
+                       WarmAppleSlices :   side
+                       WarmGarlicBread : entree
+    day : Size=36, Index=ITEMS, Domain=Any, Default=None, Mutable=False
+        Key                            : Value
+                            Applesauce :   Wed
+                            BakedBeans :   Fri
+                            BeansGreen :   Fri
+                         BeefMeatballs :   Thu
+                              Broccoli :   Tue
+                          Cheeseburger :   All
+                      ChickenDrumstick :   Tue
+                  ChickenSaladSandwich :   Fri
+                             CornBread :   Tue
+                          DominosPizza :   All
+                           FrenchFries :   Fri
+                      FreshFruitBasket :   All
+                     FruitJuicevariety :   All
+                        HashBrownPatty :   Wed
+                    Milk1PercentLowfat :   All
+                  MilkChocolateFatFree :   All
+                           MilkFatFree :   All
+                 MilkStrawberryFatFree :   Fri
+                          MiniPancakes :   Wed
+                  MixedFruitlightSyrup :   Mon
+                   PeachesInLightSyrup :   Fri
+                    PearsCanLightSyrup :   Fri
+                                Rotini :   Thu
+                SaladGrilledChickenJrh :   All
+                         SaladTossMenu :   All
+                      SandwichDeliOnWw :   Thu
+              SandwichHamAndCheeseOnWw :   Wed
+                       SandwichPbjOnWw :   All
+                SandwichTunaSaladOnSub :   Tue
+        SandwichTurkeyAndCheesePretzel :   Mon
+                        SausagePatties :   Wed
+                            SoupTomato :   Mon
+                     StuffedCrustPizza :   Mon
+                  SweetPotatoCrossTrax :   Mon
+                       WarmAppleSlices :   Thu
+                       WarmGarlicBread :   Thu
+    fat : Size=36, Index=ITEMS, Domain=Any, Default=None, Mutable=False
+        Key                            : Value
+                            Applesauce :     0
+                            BakedBeans :     0
+                            BeansGreen :     0
+                         BeefMeatballs :    13
+                              Broccoli :     0
+                          Cheeseburger :    15
+                      ChickenDrumstick :    11
+                  ChickenSaladSandwich :    18
+                             CornBread :     7
+                          DominosPizza :     8
+                           FrenchFries :     5
+                      FreshFruitBasket :     0
+                     FruitJuicevariety :     0
+                        HashBrownPatty :     7
+                    Milk1PercentLowfat :     3
+                  MilkChocolateFatFree :     0
+                           MilkFatFree :     0
+                 MilkStrawberryFatFree :     0
+                          MiniPancakes :     3
+                  MixedFruitlightSyrup :     0
+                   PeachesInLightSyrup :     0
+                    PearsCanLightSyrup :     0
+                                Rotini :     3
+                SaladGrilledChickenJrh :     8
+                         SaladTossMenu :     0
+                      SandwichDeliOnWw :    16
+              SandwichHamAndCheeseOnWw :     6
+                       SandwichPbjOnWw :    32
+                SandwichTunaSaladOnSub :     9
+        SandwichTurkeyAndCheesePretzel :     8
+                        SausagePatties :    14
+                            SoupTomato :     0
+                     StuffedCrustPizza :    17
+                  SweetPotatoCrossTrax :     9
+                       WarmAppleSlices :     0
+                       WarmGarlicBread :     4
+    freeQty : Size=3, Index=TYPES, Domain=Any, Default=None, Mutable=False
+        Key    : Value
+        entree :     1
+          milk :     1
+          side :    -1
+    kcal : Size=36, Index=ITEMS, Domain=Any, Default=None, Mutable=False
+        Key                            : Value
+                            Applesauce :   114
+                            BakedBeans :   128
+                            BeansGreen :    20
+                         BeefMeatballs :   200
+                              Broccoli :    15
+                          Cheeseburger :   341
+                      ChickenDrumstick :   190
+                  ChickenSaladSandwich :   419
+                             CornBread :   265
+                          DominosPizza :   300
+                           FrenchFries :   132
+                      FreshFruitBasket :    75
+                     FruitJuicevariety :    69
+                        HashBrownPatty :   120
+                    Milk1PercentLowfat :   112
+                  MilkChocolateFatFree :   130
+                           MilkFatFree :    92
+                 MilkStrawberryFatFree :   130
+                          MiniPancakes :   170
+                  MixedFruitlightSyrup :    82
+                   PeachesInLightSyrup :    81
+                    PearsCanLightSyrup :    86
+                                Rotini :   143
+                SaladGrilledChickenJrh :   426
+                         SaladTossMenu :    10
+                      SandwichDeliOnWw :   187
+              SandwichHamAndCheeseOnWw :    95
+                       SandwichPbjOnWw :   409
+                SandwichTunaSaladOnSub :   308
+        SandwichTurkeyAndCheesePretzel :   263
+                        SausagePatties :   180
+                            SoupTomato :    89
+                     StuffedCrustPizza :   404
+                  SweetPotatoCrossTrax :   180
+                       WarmAppleSlices :    68
+                       WarmGarlicBread :   140
+    maxFatRatio : Size=1, Index=None, Domain=Any, Default=None, Mutable=False
+        Key  : Value
+        None :     3
+    maxQty : Size=3, Index=TYPES, Domain=Any, Default=None, Mutable=False
+        Key    : Value
+        entree :    -1
+          milk :    -1
+          side :    -1
+    minCalcium : Size=1, Index=None, Domain=Any, Default=None, Mutable=False
+        Key  : Value
+        None :   433
+    minCalories : Size=1, Index=None, Domain=Any, Default=None, Mutable=False
+        Key  : Value
+        None :   876
+    minItemQty : Size=1, Index=None, Domain=Any, Default=None, Mutable=False
+        Key  : Value
+        None :     3
+    minProtein : Size=1, Index=None, Domain=Any, Default=None, Mutable=False
+        Key  : Value
+        None :    52
+    minQty : Size=3, Index=TYPES, Domain=Any, Default=None, Mutable=False
+        Key    : Value
+        entree :     1
+          milk :     1
+          side :     1
+    price : Size=3, Index=TYPES, Domain=Any, Default=None, Mutable=False
+        Key    : Value
+        entree :   2.4
+          milk :   0.6
+          side :     0
+    protein : Size=36, Index=ITEMS, Domain=Any, Default=None, Mutable=False
+        Key                            : Value
+                            Applesauce :     1
+                            BakedBeans :     7
+                            BeansGreen :     1
+                         BeefMeatballs :    15
+                              Broccoli :     1
+                          Cheeseburger :    21
+                      ChickenDrumstick :    16
+                  ChickenSaladSandwich :    21
+                             CornBread :     3
+                          DominosPizza :    21
+                           FrenchFries :     2
+                      FreshFruitBasket :     1
+                     FruitJuicevariety :     0
+                        HashBrownPatty :     2
+                    Milk1PercentLowfat :     8
+                  MilkChocolateFatFree :     8
+                           MilkFatFree :     8
+                 MilkStrawberryFatFree :     8
+                          MiniPancakes :     4
+                  MixedFruitlightSyrup :     1
+                   PeachesInLightSyrup :     1
+                    PearsCanLightSyrup :     0
+                                Rotini :     6
+                SaladGrilledChickenJrh :    24
+                         SaladTossMenu :     1
+                      SandwichDeliOnWw :     7
+              SandwichHamAndCheeseOnWw :    10
+                       SandwichPbjOnWw :    14
+                SandwichTunaSaladOnSub :    25
+        SandwichTurkeyAndCheesePretzel :    19
+                        SausagePatties :    12
+                            SoupTomato :     2
+                     StuffedCrustPizza :    18
+                  SweetPotatoCrossTrax :     1
+                       WarmAppleSlices :     0
+                       WarmGarlicBread :     5
 
-MilkChocolateFatFree			130	8	300	0	1	1	1	1	1	milk
-MilkFatFree						92	8	306	0	1	1	1	1	1	milk
-Milk1PercentLowfat				112	8	306	3	1	1	1	1	1	milk
-MilkstrawberryFatFree			130	8	300	0	0	0	0	0	1	milk;
+1 Var Declarations
+    selectedItems : Size=180, Index=ITEMS*DAYS
+        Key                                       : Lower : Value : Upper : Fixed : Stale : Domain
+                            ('Applesauce', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('Applesauce', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('Applesauce', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('Applesauce', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('Applesauce', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('BakedBeans', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('BakedBeans', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('BakedBeans', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('BakedBeans', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('BakedBeans', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('BeansGreen', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('BeansGreen', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('BeansGreen', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('BeansGreen', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('BeansGreen', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                         ('BeefMeatballs', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                         ('BeefMeatballs', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                         ('BeefMeatballs', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                         ('BeefMeatballs', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                         ('BeefMeatballs', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                              ('Broccoli', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                              ('Broccoli', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                              ('Broccoli', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                              ('Broccoli', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                              ('Broccoli', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('Cheeseburger', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('Cheeseburger', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('Cheeseburger', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('Cheeseburger', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('Cheeseburger', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('ChickenDrumstick', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('ChickenDrumstick', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('ChickenDrumstick', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('ChickenDrumstick', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('ChickenDrumstick', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('ChickenSaladSandwich', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('ChickenSaladSandwich', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('ChickenSaladSandwich', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('ChickenSaladSandwich', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('ChickenSaladSandwich', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                             ('CornBread', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                             ('CornBread', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                             ('CornBread', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                             ('CornBread', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                             ('CornBread', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('DominosPizza', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('DominosPizza', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('DominosPizza', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('DominosPizza', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('DominosPizza', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                           ('FrenchFries', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                           ('FrenchFries', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                           ('FrenchFries', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                           ('FrenchFries', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                           ('FrenchFries', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('FreshFruitBasket', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('FreshFruitBasket', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('FreshFruitBasket', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('FreshFruitBasket', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('FreshFruitBasket', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                     ('FruitJuicevariety', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                     ('FruitJuicevariety', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                     ('FruitJuicevariety', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                     ('FruitJuicevariety', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                     ('FruitJuicevariety', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                        ('HashBrownPatty', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                        ('HashBrownPatty', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                        ('HashBrownPatty', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                        ('HashBrownPatty', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                        ('HashBrownPatty', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                    ('Milk1PercentLowfat', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                    ('Milk1PercentLowfat', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                    ('Milk1PercentLowfat', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                    ('Milk1PercentLowfat', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                    ('Milk1PercentLowfat', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('MilkChocolateFatFree', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('MilkChocolateFatFree', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('MilkChocolateFatFree', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('MilkChocolateFatFree', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('MilkChocolateFatFree', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                           ('MilkFatFree', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                           ('MilkFatFree', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                           ('MilkFatFree', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                           ('MilkFatFree', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                           ('MilkFatFree', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                 ('MilkStrawberryFatFree', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                 ('MilkStrawberryFatFree', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                 ('MilkStrawberryFatFree', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                 ('MilkStrawberryFatFree', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                 ('MilkStrawberryFatFree', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('MiniPancakes', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('MiniPancakes', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('MiniPancakes', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('MiniPancakes', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                          ('MiniPancakes', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('MixedFruitlightSyrup', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('MixedFruitlightSyrup', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('MixedFruitlightSyrup', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('MixedFruitlightSyrup', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('MixedFruitlightSyrup', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                   ('PeachesInLightSyrup', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                   ('PeachesInLightSyrup', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                   ('PeachesInLightSyrup', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                   ('PeachesInLightSyrup', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                   ('PeachesInLightSyrup', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                    ('PearsCanLightSyrup', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                    ('PearsCanLightSyrup', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                    ('PearsCanLightSyrup', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                    ('PearsCanLightSyrup', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                    ('PearsCanLightSyrup', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                                ('Rotini', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                                ('Rotini', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                                ('Rotini', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                                ('Rotini', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                                ('Rotini', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                ('SaladGrilledChickenJrh', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                ('SaladGrilledChickenJrh', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                ('SaladGrilledChickenJrh', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                ('SaladGrilledChickenJrh', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                ('SaladGrilledChickenJrh', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                         ('SaladTossMenu', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                         ('SaladTossMenu', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                         ('SaladTossMenu', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                         ('SaladTossMenu', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                         ('SaladTossMenu', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('SandwichDeliOnWw', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('SandwichDeliOnWw', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('SandwichDeliOnWw', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('SandwichDeliOnWw', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                      ('SandwichDeliOnWw', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+              ('SandwichHamAndCheeseOnWw', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+              ('SandwichHamAndCheeseOnWw', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+              ('SandwichHamAndCheeseOnWw', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+              ('SandwichHamAndCheeseOnWw', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+              ('SandwichHamAndCheeseOnWw', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('SandwichPbjOnWw', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('SandwichPbjOnWw', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('SandwichPbjOnWw', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('SandwichPbjOnWw', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('SandwichPbjOnWw', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                ('SandwichTunaSaladOnSub', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                ('SandwichTunaSaladOnSub', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                ('SandwichTunaSaladOnSub', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                ('SandwichTunaSaladOnSub', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                ('SandwichTunaSaladOnSub', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+        ('SandwichTurkeyAndCheesePretzel', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+        ('SandwichTurkeyAndCheesePretzel', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+        ('SandwichTurkeyAndCheesePretzel', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+        ('SandwichTurkeyAndCheesePretzel', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+        ('SandwichTurkeyAndCheesePretzel', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                        ('SausagePatties', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                        ('SausagePatties', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                        ('SausagePatties', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                        ('SausagePatties', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                        ('SausagePatties', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('SoupTomato', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('SoupTomato', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('SoupTomato', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('SoupTomato', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                            ('SoupTomato', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                     ('StuffedCrustPizza', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                     ('StuffedCrustPizza', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                     ('StuffedCrustPizza', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                     ('StuffedCrustPizza', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                     ('StuffedCrustPizza', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('SweetPotatoCrossTrax', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('SweetPotatoCrossTrax', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('SweetPotatoCrossTrax', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('SweetPotatoCrossTrax', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                  ('SweetPotatoCrossTrax', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('WarmAppleSlices', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('WarmAppleSlices', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('WarmAppleSlices', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('WarmAppleSlices', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('WarmAppleSlices', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('WarmGarlicBread', 'Fri') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('WarmGarlicBread', 'Mon') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('WarmGarlicBread', 'Thu') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('WarmGarlicBread', 'Tue') :     0 :  None :  None : False :  True : NonNegativeIntegers
+                       ('WarmGarlicBread', 'Wed') :     0 :  None :  None : False :  True : NonNegativeIntegers
+
+1 Objective Declarations
+    minCost : Size=1, Index=None, Active=True
+        Key  : Active : Sense    : Expression
+        None :   True : minimize : 2.4*selectedItems[StuffedCrustPizza,Mon] + 2.4*selectedItems[StuffedCrustPizza,Tue] + 2.4*selectedItems[StuffedCrustPizza,Wed] + 2.4*selectedItems[StuffedCrustPizza,Thu] + 2.4*selectedItems[StuffedCrustPizza,Fri] + 2.4*selectedItems[SandwichTurkeyAndCheesePretzel,Mon] + 2.4*selectedItems[SandwichTurkeyAndCheesePretzel,Tue] + 2.4*selectedItems[SandwichTurkeyAndCheesePretzel,Wed] + 2.4*selectedItems[SandwichTurkeyAndCheesePretzel,Thu] + 2.4*selectedItems[SandwichTurkeyAndCheesePretzel,Fri] + 2.4*selectedItems[SandwichPbjOnWw,Mon] + 2.4*selectedItems[SandwichPbjOnWw,Tue] + 2.4*selectedItems[SandwichPbjOnWw,Wed] + 2.4*selectedItems[SandwichPbjOnWw,Thu] + 2.4*selectedItems[SandwichPbjOnWw,Fri] + 2.4*selectedItems[Cheeseburger,Mon] + 2.4*selectedItems[Cheeseburger,Tue] + 2.4*selectedItems[Cheeseburger,Wed] + 2.4*selectedItems[Cheeseburger,Thu] + 2.4*selectedItems[Cheeseburger,Fri] + 2.4*selectedItems[DominosPizza,Mon] + 2.4*selectedItems[DominosPizza,Tue] + 2.4*selectedItems[DominosPizza,Wed] + 2.4*selectedItems[DominosPizza,Thu] + 2.4*selectedItems[DominosPizza,Fri] + 2.4*selectedItems[SaladGrilledChickenJrh,Mon] + 2.4*selectedItems[SaladGrilledChickenJrh,Tue] + 2.4*selectedItems[SaladGrilledChickenJrh,Wed] + 2.4*selectedItems[SaladGrilledChickenJrh,Thu] + 2.4*selectedItems[SaladGrilledChickenJrh,Fri] + 2.4*selectedItems[ChickenDrumstick,Mon] + 2.4*selectedItems[ChickenDrumstick,Tue] + 2.4*selectedItems[ChickenDrumstick,Wed] + 2.4*selectedItems[ChickenDrumstick,Thu] + 2.4*selectedItems[ChickenDrumstick,Fri] + 2.4*selectedItems[CornBread,Mon] + 2.4*selectedItems[CornBread,Tue] + 2.4*selectedItems[CornBread,Wed] + 2.4*selectedItems[CornBread,Thu] + 2.4*selectedItems[CornBread,Fri] + 2.4*selectedItems[SandwichTunaSaladOnSub,Mon] + 2.4*selectedItems[SandwichTunaSaladOnSub,Tue] + 2.4*selectedItems[SandwichTunaSaladOnSub,Wed] + 2.4*selectedItems[SandwichTunaSaladOnSub,Thu] + 2.4*selectedItems[SandwichTunaSaladOnSub,Fri] + 2.4*selectedItems[MiniPancakes,Mon] + 2.4*selectedItems[MiniPancakes,Tue] + 2.4*selectedItems[MiniPancakes,Wed] + 2.4*selectedItems[MiniPancakes,Thu] + 2.4*selectedItems[MiniPancakes,Fri] + 2.4*selectedItems[SausagePatties,Mon] + 2.4*selectedItems[SausagePatties,Tue] + 2.4*selectedItems[SausagePatties,Wed] + 2.4*selectedItems[SausagePatties,Thu] + 2.4*selectedItems[SausagePatties,Fri] + 2.4*selectedItems[SandwichHamAndCheeseOnWw,Mon] + 2.4*selectedItems[SandwichHamAndCheeseOnWw,Tue] + 2.4*selectedItems[SandwichHamAndCheeseOnWw,Wed] + 2.4*selectedItems[SandwichHamAndCheeseOnWw,Thu] + 2.4*selectedItems[SandwichHamAndCheeseOnWw,Fri] + 2.4*selectedItems[Rotini,Mon] + 2.4*selectedItems[Rotini,Tue] + 2.4*selectedItems[Rotini,Wed] + 2.4*selectedItems[Rotini,Thu] + 2.4*selectedItems[Rotini,Fri] + 2.4*selectedItems[BeefMeatballs,Mon] + 2.4*selectedItems[BeefMeatballs,Tue] + 2.4*selectedItems[BeefMeatballs,Wed] + 2.4*selectedItems[BeefMeatballs,Thu] + 2.4*selectedItems[BeefMeatballs,Fri] + 2.4*selectedItems[WarmGarlicBread,Mon] + 2.4*selectedItems[WarmGarlicBread,Tue] + 2.4*selectedItems[WarmGarlicBread,Wed] + 2.4*selectedItems[WarmGarlicBread,Thu] + 2.4*selectedItems[WarmGarlicBread,Fri] + 2.4*selectedItems[SandwichDeliOnWw,Mon] + 2.4*selectedItems[SandwichDeliOnWw,Tue] + 2.4*selectedItems[SandwichDeliOnWw,Wed] + 2.4*selectedItems[SandwichDeliOnWw,Thu] + 2.4*selectedItems[SandwichDeliOnWw,Fri] + 2.4*selectedItems[FrenchFries,Mon] + 2.4*selectedItems[FrenchFries,Tue] + 2.4*selectedItems[FrenchFries,Wed] + 2.4*selectedItems[FrenchFries,Thu] + 2.4*selectedItems[FrenchFries,Fri] + 2.4*selectedItems[ChickenSaladSandwich,Mon] + 2.4*selectedItems[ChickenSaladSandwich,Tue] + 2.4*selectedItems[ChickenSaladSandwich,Wed] + 2.4*selectedItems[ChickenSaladSandwich,Thu] + 2.4*selectedItems[ChickenSaladSandwich,Fri] + 0*selectedItems[SoupTomato,Mon] + 0*selectedItems[SoupTomato,Tue] + 0*selectedItems[SoupTomato,Wed] + 0*selectedItems[SoupTomato,Thu] + 0*selectedItems[SoupTomato,Fri] + 0*selectedItems[SweetPotatoCrossTrax,Mon] + 0*selectedItems[SweetPotatoCrossTrax,Tue] + 0*selectedItems[SweetPotatoCrossTrax,Wed] + 0*selectedItems[SweetPotatoCrossTrax,Thu] + 0*selectedItems[SweetPotatoCrossTrax,Fri] + 0*selectedItems[SaladTossMenu,Mon] + 0*selectedItems[SaladTossMenu,Tue] + 0*selectedItems[SaladTossMenu,Wed] + 0*selectedItems[SaladTossMenu,Thu] + 0*selectedItems[SaladTossMenu,Fri] + 0*selectedItems[MixedFruitlightSyrup,Mon] + 0*selectedItems[MixedFruitlightSyrup,Tue] + 0*selectedItems[MixedFruitlightSyrup,Wed] + 0*selectedItems[MixedFruitlightSyrup,Thu] + 0*selectedItems[MixedFruitlightSyrup,Fri] + 0*selectedItems[FreshFruitBasket,Mon] + 0*selectedItems[FreshFruitBasket,Tue] + 0*selectedItems[FreshFruitBasket,Wed] + 0*selectedItems[FreshFruitBasket,Thu] + 0*selectedItems[FreshFruitBasket,Fri] + 0*selectedItems[FruitJuicevariety,Mon] + 0*selectedItems[FruitJuicevariety,Tue] + 0*selectedItems[FruitJuicevariety,Wed] + 0*selectedItems[FruitJuicevariety,Thu] + 0*selectedItems[FruitJuicevariety,Fri] + 0*selectedItems[Broccoli,Mon] + 0*selectedItems[Broccoli,Tue] + 0*selectedItems[Broccoli,Wed] + 0*selectedItems[Broccoli,Thu] + 0*selectedItems[Broccoli,Fri] + 0*selectedItems[Applesauce,Mon] + 0*selectedItems[Applesauce,Tue] + 0*selectedItems[Applesauce,Wed] + 0*selectedItems[Applesauce,Thu] + 0*selectedItems[Applesauce,Fri] + 0*selectedItems[HashBrownPatty,Mon] + 0*selectedItems[HashBrownPatty,Tue] + 0*selectedItems[HashBrownPatty,Wed] + 0*selectedItems[HashBrownPatty,Thu] + 0*selectedItems[HashBrownPatty,Fri] + 0*selectedItems[WarmAppleSlices,Mon] + 0*selectedItems[WarmAppleSlices,Tue] + 0*selectedItems[WarmAppleSlices,Wed] + 0*selectedItems[WarmAppleSlices,Thu] + 0*selectedItems[WarmAppleSlices,Fri] + 0*selectedItems[BeansGreen,Mon] + 0*selectedItems[BeansGreen,Tue] + 0*selectedItems[BeansGreen,Wed] + 0*selectedItems[BeansGreen,Thu] + 0*selectedItems[BeansGreen,Fri] + 0*selectedItems[PeachesInLightSyrup,Mon] + 0*selectedItems[PeachesInLightSyrup,Tue] + 0*selectedItems[PeachesInLightSyrup,Wed] + 0*selectedItems[PeachesInLightSyrup,Thu] + 0*selectedItems[PeachesInLightSyrup,Fri] + 0*selectedItems[BakedBeans,Mon] + 0*selectedItems[BakedBeans,Tue] + 0*selectedItems[BakedBeans,Wed] + 0*selectedItems[BakedBeans,Thu] + 0*selectedItems[BakedBeans,Fri] + 0*selectedItems[PearsCanLightSyrup,Mon] + 0*selectedItems[PearsCanLightSyrup,Tue] + 0*selectedItems[PearsCanLightSyrup,Wed] + 0*selectedItems[PearsCanLightSyrup,Thu] + 0*selectedItems[PearsCanLightSyrup,Fri] + 0.6*selectedItems[MilkChocolateFatFree,Mon] + 0.6*selectedItems[MilkChocolateFatFree,Tue] + 0.6*selectedItems[MilkChocolateFatFree,Wed] + 0.6*selectedItems[MilkChocolateFatFree,Thu] + 0.6*selectedItems[MilkChocolateFatFree,Fri] + 0.6*selectedItems[MilkFatFree,Mon] + 0.6*selectedItems[MilkFatFree,Tue] + 0.6*selectedItems[MilkFatFree,Wed] + 0.6*selectedItems[MilkFatFree,Thu] + 0.6*selectedItems[MilkFatFree,Fri] + 0.6*selectedItems[Milk1PercentLowfat,Mon] + 0.6*selectedItems[Milk1PercentLowfat,Tue] + 0.6*selectedItems[Milk1PercentLowfat,Wed] + 0.6*selectedItems[Milk1PercentLowfat,Thu] + 0.6*selectedItems[Milk1PercentLowfat,Fri] + 0.6*selectedItems[MilkStrawberryFatFree,Mon] + 0.6*selectedItems[MilkStrawberryFatFree,Tue] + 0.6*selectedItems[MilkStrawberryFatFree,Wed] + 0.6*selectedItems[MilkStrawberryFatFree,Thu] + 0.6*selectedItems[MilkStrawberryFatFree,Fri]
+
+3 Constraint Declarations
+    fatRatio : Size=5, Index=DAYS, Active=True
+        Key : Lower : Body                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            : Upper : Active
+        Fri :  -Inf : 3*(17*selectedItems[StuffedCrustPizza,Fri] + 8*selectedItems[SandwichTurkeyAndCheesePretzel,Fri] + 32*selectedItems[SandwichPbjOnWw,Fri] + 15*selectedItems[Cheeseburger,Fri] + 8*selectedItems[DominosPizza,Fri] + 8*selectedItems[SaladGrilledChickenJrh,Fri] + 11*selectedItems[ChickenDrumstick,Fri] + 7*selectedItems[CornBread,Fri] + 9*selectedItems[SandwichTunaSaladOnSub,Fri] + 3*selectedItems[MiniPancakes,Fri] + 14*selectedItems[SausagePatties,Fri] + 6*selectedItems[SandwichHamAndCheeseOnWw,Fri] + 3*selectedItems[Rotini,Fri] + 13*selectedItems[BeefMeatballs,Fri] + 4*selectedItems[WarmGarlicBread,Fri] + 16*selectedItems[SandwichDeliOnWw,Fri] + 5*selectedItems[FrenchFries,Fri] + 18*selectedItems[ChickenSaladSandwich,Fri] + 0*selectedItems[SoupTomato,Fri] + 9*selectedItems[SweetPotatoCrossTrax,Fri] + 0*selectedItems[SaladTossMenu,Fri] + 0*selectedItems[MixedFruitlightSyrup,Fri] + 0*selectedItems[FreshFruitBasket,Fri] + 0*selectedItems[FruitJuicevariety,Fri] + 0*selectedItems[Broccoli,Fri] + 0*selectedItems[Applesauce,Fri] + 7*selectedItems[HashBrownPatty,Fri] + 0*selectedItems[WarmAppleSlices,Fri] + 0*selectedItems[BeansGreen,Fri] + 0*selectedItems[PeachesInLightSyrup,Fri] + 0*selectedItems[BakedBeans,Fri] + 0*selectedItems[PearsCanLightSyrup,Fri] + 0*selectedItems[MilkChocolateFatFree,Fri] + 0*selectedItems[MilkFatFree,Fri] + 3*selectedItems[Milk1PercentLowfat,Fri] + 0*selectedItems[MilkStrawberryFatFree,Fri]) - (404*selectedItems[StuffedCrustPizza,Fri] + 263*selectedItems[SandwichTurkeyAndCheesePretzel,Fri] + 409*selectedItems[SandwichPbjOnWw,Fri] + 341*selectedItems[Cheeseburger,Fri] + 300*selectedItems[DominosPizza,Fri] + 426*selectedItems[SaladGrilledChickenJrh,Fri] + 190*selectedItems[ChickenDrumstick,Fri] + 265*selectedItems[CornBread,Fri] + 308*selectedItems[SandwichTunaSaladOnSub,Fri] + 170*selectedItems[MiniPancakes,Fri] + 180*selectedItems[SausagePatties,Fri] + 95*selectedItems[SandwichHamAndCheeseOnWw,Fri] + 143*selectedItems[Rotini,Fri] + 200*selectedItems[BeefMeatballs,Fri] + 140*selectedItems[WarmGarlicBread,Fri] + 187*selectedItems[SandwichDeliOnWw,Fri] + 132*selectedItems[FrenchFries,Fri] + 419*selectedItems[ChickenSaladSandwich,Fri] + 89*selectedItems[SoupTomato,Fri] + 180*selectedItems[SweetPotatoCrossTrax,Fri] + 10*selectedItems[SaladTossMenu,Fri] + 82*selectedItems[MixedFruitlightSyrup,Fri] + 75*selectedItems[FreshFruitBasket,Fri] + 69*selectedItems[FruitJuicevariety,Fri] + 15*selectedItems[Broccoli,Fri] + 114*selectedItems[Applesauce,Fri] + 120*selectedItems[HashBrownPatty,Fri] + 68*selectedItems[WarmAppleSlices,Fri] + 20*selectedItems[BeansGreen,Fri] + 81*selectedItems[PeachesInLightSyrup,Fri] + 128*selectedItems[BakedBeans,Fri] + 86*selectedItems[PearsCanLightSyrup,Fri] + 130*selectedItems[MilkChocolateFatFree,Fri] + 92*selectedItems[MilkFatFree,Fri] + 112*selectedItems[Milk1PercentLowfat,Fri] + 130*selectedItems[MilkStrawberryFatFree,Fri]) :   0.0 :   True
+        Mon :  -Inf : 3*(17*selectedItems[StuffedCrustPizza,Mon] + 8*selectedItems[SandwichTurkeyAndCheesePretzel,Mon] + 32*selectedItems[SandwichPbjOnWw,Mon] + 15*selectedItems[Cheeseburger,Mon] + 8*selectedItems[DominosPizza,Mon] + 8*selectedItems[SaladGrilledChickenJrh,Mon] + 11*selectedItems[ChickenDrumstick,Mon] + 7*selectedItems[CornBread,Mon] + 9*selectedItems[SandwichTunaSaladOnSub,Mon] + 3*selectedItems[MiniPancakes,Mon] + 14*selectedItems[SausagePatties,Mon] + 6*selectedItems[SandwichHamAndCheeseOnWw,Mon] + 3*selectedItems[Rotini,Mon] + 13*selectedItems[BeefMeatballs,Mon] + 4*selectedItems[WarmGarlicBread,Mon] + 16*selectedItems[SandwichDeliOnWw,Mon] + 5*selectedItems[FrenchFries,Mon] + 18*selectedItems[ChickenSaladSandwich,Mon] + 0*selectedItems[SoupTomato,Mon] + 9*selectedItems[SweetPotatoCrossTrax,Mon] + 0*selectedItems[SaladTossMenu,Mon] + 0*selectedItems[MixedFruitlightSyrup,Mon] + 0*selectedItems[FreshFruitBasket,Mon] + 0*selectedItems[FruitJuicevariety,Mon] + 0*selectedItems[Broccoli,Mon] + 0*selectedItems[Applesauce,Mon] + 7*selectedItems[HashBrownPatty,Mon] + 0*selectedItems[WarmAppleSlices,Mon] + 0*selectedItems[BeansGreen,Mon] + 0*selectedItems[PeachesInLightSyrup,Mon] + 0*selectedItems[BakedBeans,Mon] + 0*selectedItems[PearsCanLightSyrup,Mon] + 0*selectedItems[MilkChocolateFatFree,Mon] + 0*selectedItems[MilkFatFree,Mon] + 3*selectedItems[Milk1PercentLowfat,Mon] + 0*selectedItems[MilkStrawberryFatFree,Mon]) - (404*selectedItems[StuffedCrustPizza,Mon] + 263*selectedItems[SandwichTurkeyAndCheesePretzel,Mon] + 409*selectedItems[SandwichPbjOnWw,Mon] + 341*selectedItems[Cheeseburger,Mon] + 300*selectedItems[DominosPizza,Mon] + 426*selectedItems[SaladGrilledChickenJrh,Mon] + 190*selectedItems[ChickenDrumstick,Mon] + 265*selectedItems[CornBread,Mon] + 308*selectedItems[SandwichTunaSaladOnSub,Mon] + 170*selectedItems[MiniPancakes,Mon] + 180*selectedItems[SausagePatties,Mon] + 95*selectedItems[SandwichHamAndCheeseOnWw,Mon] + 143*selectedItems[Rotini,Mon] + 200*selectedItems[BeefMeatballs,Mon] + 140*selectedItems[WarmGarlicBread,Mon] + 187*selectedItems[SandwichDeliOnWw,Mon] + 132*selectedItems[FrenchFries,Mon] + 419*selectedItems[ChickenSaladSandwich,Mon] + 89*selectedItems[SoupTomato,Mon] + 180*selectedItems[SweetPotatoCrossTrax,Mon] + 10*selectedItems[SaladTossMenu,Mon] + 82*selectedItems[MixedFruitlightSyrup,Mon] + 75*selectedItems[FreshFruitBasket,Mon] + 69*selectedItems[FruitJuicevariety,Mon] + 15*selectedItems[Broccoli,Mon] + 114*selectedItems[Applesauce,Mon] + 120*selectedItems[HashBrownPatty,Mon] + 68*selectedItems[WarmAppleSlices,Mon] + 20*selectedItems[BeansGreen,Mon] + 81*selectedItems[PeachesInLightSyrup,Mon] + 128*selectedItems[BakedBeans,Mon] + 86*selectedItems[PearsCanLightSyrup,Mon] + 130*selectedItems[MilkChocolateFatFree,Mon] + 92*selectedItems[MilkFatFree,Mon] + 112*selectedItems[Milk1PercentLowfat,Mon] + 130*selectedItems[MilkStrawberryFatFree,Mon]) :   0.0 :   True
+        Thu :  -Inf : 3*(17*selectedItems[StuffedCrustPizza,Thu] + 8*selectedItems[SandwichTurkeyAndCheesePretzel,Thu] + 32*selectedItems[SandwichPbjOnWw,Thu] + 15*selectedItems[Cheeseburger,Thu] + 8*selectedItems[DominosPizza,Thu] + 8*selectedItems[SaladGrilledChickenJrh,Thu] + 11*selectedItems[ChickenDrumstick,Thu] + 7*selectedItems[CornBread,Thu] + 9*selectedItems[SandwichTunaSaladOnSub,Thu] + 3*selectedItems[MiniPancakes,Thu] + 14*selectedItems[SausagePatties,Thu] + 6*selectedItems[SandwichHamAndCheeseOnWw,Thu] + 3*selectedItems[Rotini,Thu] + 13*selectedItems[BeefMeatballs,Thu] + 4*selectedItems[WarmGarlicBread,Thu] + 16*selectedItems[SandwichDeliOnWw,Thu] + 5*selectedItems[FrenchFries,Thu] + 18*selectedItems[ChickenSaladSandwich,Thu] + 0*selectedItems[SoupTomato,Thu] + 9*selectedItems[SweetPotatoCrossTrax,Thu] + 0*selectedItems[SaladTossMenu,Thu] + 0*selectedItems[MixedFruitlightSyrup,Thu] + 0*selectedItems[FreshFruitBasket,Thu] + 0*selectedItems[FruitJuicevariety,Thu] + 0*selectedItems[Broccoli,Thu] + 0*selectedItems[Applesauce,Thu] + 7*selectedItems[HashBrownPatty,Thu] + 0*selectedItems[WarmAppleSlices,Thu] + 0*selectedItems[BeansGreen,Thu] + 0*selectedItems[PeachesInLightSyrup,Thu] + 0*selectedItems[BakedBeans,Thu] + 0*selectedItems[PearsCanLightSyrup,Thu] + 0*selectedItems[MilkChocolateFatFree,Thu] + 0*selectedItems[MilkFatFree,Thu] + 3*selectedItems[Milk1PercentLowfat,Thu] + 0*selectedItems[MilkStrawberryFatFree,Thu]) - (404*selectedItems[StuffedCrustPizza,Thu] + 263*selectedItems[SandwichTurkeyAndCheesePretzel,Thu] + 409*selectedItems[SandwichPbjOnWw,Thu] + 341*selectedItems[Cheeseburger,Thu] + 300*selectedItems[DominosPizza,Thu] + 426*selectedItems[SaladGrilledChickenJrh,Thu] + 190*selectedItems[ChickenDrumstick,Thu] + 265*selectedItems[CornBread,Thu] + 308*selectedItems[SandwichTunaSaladOnSub,Thu] + 170*selectedItems[MiniPancakes,Thu] + 180*selectedItems[SausagePatties,Thu] + 95*selectedItems[SandwichHamAndCheeseOnWw,Thu] + 143*selectedItems[Rotini,Thu] + 200*selectedItems[BeefMeatballs,Thu] + 140*selectedItems[WarmGarlicBread,Thu] + 187*selectedItems[SandwichDeliOnWw,Thu] + 132*selectedItems[FrenchFries,Thu] + 419*selectedItems[ChickenSaladSandwich,Thu] + 89*selectedItems[SoupTomato,Thu] + 180*selectedItems[SweetPotatoCrossTrax,Thu] + 10*selectedItems[SaladTossMenu,Thu] + 82*selectedItems[MixedFruitlightSyrup,Thu] + 75*selectedItems[FreshFruitBasket,Thu] + 69*selectedItems[FruitJuicevariety,Thu] + 15*selectedItems[Broccoli,Thu] + 114*selectedItems[Applesauce,Thu] + 120*selectedItems[HashBrownPatty,Thu] + 68*selectedItems[WarmAppleSlices,Thu] + 20*selectedItems[BeansGreen,Thu] + 81*selectedItems[PeachesInLightSyrup,Thu] + 128*selectedItems[BakedBeans,Thu] + 86*selectedItems[PearsCanLightSyrup,Thu] + 130*selectedItems[MilkChocolateFatFree,Thu] + 92*selectedItems[MilkFatFree,Thu] + 112*selectedItems[Milk1PercentLowfat,Thu] + 130*selectedItems[MilkStrawberryFatFree,Thu]) :   0.0 :   True
+        Tue :  -Inf : 3*(17*selectedItems[StuffedCrustPizza,Tue] + 8*selectedItems[SandwichTurkeyAndCheesePretzel,Tue] + 32*selectedItems[SandwichPbjOnWw,Tue] + 15*selectedItems[Cheeseburger,Tue] + 8*selectedItems[DominosPizza,Tue] + 8*selectedItems[SaladGrilledChickenJrh,Tue] + 11*selectedItems[ChickenDrumstick,Tue] + 7*selectedItems[CornBread,Tue] + 9*selectedItems[SandwichTunaSaladOnSub,Tue] + 3*selectedItems[MiniPancakes,Tue] + 14*selectedItems[SausagePatties,Tue] + 6*selectedItems[SandwichHamAndCheeseOnWw,Tue] + 3*selectedItems[Rotini,Tue] + 13*selectedItems[BeefMeatballs,Tue] + 4*selectedItems[WarmGarlicBread,Tue] + 16*selectedItems[SandwichDeliOnWw,Tue] + 5*selectedItems[FrenchFries,Tue] + 18*selectedItems[ChickenSaladSandwich,Tue] + 0*selectedItems[SoupTomato,Tue] + 9*selectedItems[SweetPotatoCrossTrax,Tue] + 0*selectedItems[SaladTossMenu,Tue] + 0*selectedItems[MixedFruitlightSyrup,Tue] + 0*selectedItems[FreshFruitBasket,Tue] + 0*selectedItems[FruitJuicevariety,Tue] + 0*selectedItems[Broccoli,Tue] + 0*selectedItems[Applesauce,Tue] + 7*selectedItems[HashBrownPatty,Tue] + 0*selectedItems[WarmAppleSlices,Tue] + 0*selectedItems[BeansGreen,Tue] + 0*selectedItems[PeachesInLightSyrup,Tue] + 0*selectedItems[BakedBeans,Tue] + 0*selectedItems[PearsCanLightSyrup,Tue] + 0*selectedItems[MilkChocolateFatFree,Tue] + 0*selectedItems[MilkFatFree,Tue] + 3*selectedItems[Milk1PercentLowfat,Tue] + 0*selectedItems[MilkStrawberryFatFree,Tue]) - (404*selectedItems[StuffedCrustPizza,Tue] + 263*selectedItems[SandwichTurkeyAndCheesePretzel,Tue] + 409*selectedItems[SandwichPbjOnWw,Tue] + 341*selectedItems[Cheeseburger,Tue] + 300*selectedItems[DominosPizza,Tue] + 426*selectedItems[SaladGrilledChickenJrh,Tue] + 190*selectedItems[ChickenDrumstick,Tue] + 265*selectedItems[CornBread,Tue] + 308*selectedItems[SandwichTunaSaladOnSub,Tue] + 170*selectedItems[MiniPancakes,Tue] + 180*selectedItems[SausagePatties,Tue] + 95*selectedItems[SandwichHamAndCheeseOnWw,Tue] + 143*selectedItems[Rotini,Tue] + 200*selectedItems[BeefMeatballs,Tue] + 140*selectedItems[WarmGarlicBread,Tue] + 187*selectedItems[SandwichDeliOnWw,Tue] + 132*selectedItems[FrenchFries,Tue] + 419*selectedItems[ChickenSaladSandwich,Tue] + 89*selectedItems[SoupTomato,Tue] + 180*selectedItems[SweetPotatoCrossTrax,Tue] + 10*selectedItems[SaladTossMenu,Tue] + 82*selectedItems[MixedFruitlightSyrup,Tue] + 75*selectedItems[FreshFruitBasket,Tue] + 69*selectedItems[FruitJuicevariety,Tue] + 15*selectedItems[Broccoli,Tue] + 114*selectedItems[Applesauce,Tue] + 120*selectedItems[HashBrownPatty,Tue] + 68*selectedItems[WarmAppleSlices,Tue] + 20*selectedItems[BeansGreen,Tue] + 81*selectedItems[PeachesInLightSyrup,Tue] + 128*selectedItems[BakedBeans,Tue] + 86*selectedItems[PearsCanLightSyrup,Tue] + 130*selectedItems[MilkChocolateFatFree,Tue] + 92*selectedItems[MilkFatFree,Tue] + 112*selectedItems[Milk1PercentLowfat,Tue] + 130*selectedItems[MilkStrawberryFatFree,Tue]) :   0.0 :   True
+        Wed :  -Inf : 3*(17*selectedItems[StuffedCrustPizza,Wed] + 8*selectedItems[SandwichTurkeyAndCheesePretzel,Wed] + 32*selectedItems[SandwichPbjOnWw,Wed] + 15*selectedItems[Cheeseburger,Wed] + 8*selectedItems[DominosPizza,Wed] + 8*selectedItems[SaladGrilledChickenJrh,Wed] + 11*selectedItems[ChickenDrumstick,Wed] + 7*selectedItems[CornBread,Wed] + 9*selectedItems[SandwichTunaSaladOnSub,Wed] + 3*selectedItems[MiniPancakes,Wed] + 14*selectedItems[SausagePatties,Wed] + 6*selectedItems[SandwichHamAndCheeseOnWw,Wed] + 3*selectedItems[Rotini,Wed] + 13*selectedItems[BeefMeatballs,Wed] + 4*selectedItems[WarmGarlicBread,Wed] + 16*selectedItems[SandwichDeliOnWw,Wed] + 5*selectedItems[FrenchFries,Wed] + 18*selectedItems[ChickenSaladSandwich,Wed] + 0*selectedItems[SoupTomato,Wed] + 9*selectedItems[SweetPotatoCrossTrax,Wed] + 0*selectedItems[SaladTossMenu,Wed] + 0*selectedItems[MixedFruitlightSyrup,Wed] + 0*selectedItems[FreshFruitBasket,Wed] + 0*selectedItems[FruitJuicevariety,Wed] + 0*selectedItems[Broccoli,Wed] + 0*selectedItems[Applesauce,Wed] + 7*selectedItems[HashBrownPatty,Wed] + 0*selectedItems[WarmAppleSlices,Wed] + 0*selectedItems[BeansGreen,Wed] + 0*selectedItems[PeachesInLightSyrup,Wed] + 0*selectedItems[BakedBeans,Wed] + 0*selectedItems[PearsCanLightSyrup,Wed] + 0*selectedItems[MilkChocolateFatFree,Wed] + 0*selectedItems[MilkFatFree,Wed] + 3*selectedItems[Milk1PercentLowfat,Wed] + 0*selectedItems[MilkStrawberryFatFree,Wed]) - (404*selectedItems[StuffedCrustPizza,Wed] + 263*selectedItems[SandwichTurkeyAndCheesePretzel,Wed] + 409*selectedItems[SandwichPbjOnWw,Wed] + 341*selectedItems[Cheeseburger,Wed] + 300*selectedItems[DominosPizza,Wed] + 426*selectedItems[SaladGrilledChickenJrh,Wed] + 190*selectedItems[ChickenDrumstick,Wed] + 265*selectedItems[CornBread,Wed] + 308*selectedItems[SandwichTunaSaladOnSub,Wed] + 170*selectedItems[MiniPancakes,Wed] + 180*selectedItems[SausagePatties,Wed] + 95*selectedItems[SandwichHamAndCheeseOnWw,Wed] + 143*selectedItems[Rotini,Wed] + 200*selectedItems[BeefMeatballs,Wed] + 140*selectedItems[WarmGarlicBread,Wed] + 187*selectedItems[SandwichDeliOnWw,Wed] + 132*selectedItems[FrenchFries,Wed] + 419*selectedItems[ChickenSaladSandwich,Wed] + 89*selectedItems[SoupTomato,Wed] + 180*selectedItems[SweetPotatoCrossTrax,Wed] + 10*selectedItems[SaladTossMenu,Wed] + 82*selectedItems[MixedFruitlightSyrup,Wed] + 75*selectedItems[FreshFruitBasket,Wed] + 69*selectedItems[FruitJuicevariety,Wed] + 15*selectedItems[Broccoli,Wed] + 114*selectedItems[Applesauce,Wed] + 120*selectedItems[HashBrownPatty,Wed] + 68*selectedItems[WarmAppleSlices,Wed] + 20*selectedItems[BeansGreen,Wed] + 81*selectedItems[PeachesInLightSyrup,Wed] + 128*selectedItems[BakedBeans,Wed] + 86*selectedItems[PearsCanLightSyrup,Wed] + 130*selectedItems[MilkChocolateFatFree,Wed] + 92*selectedItems[MilkFatFree,Wed] + 112*selectedItems[Milk1PercentLowfat,Wed] + 130*selectedItems[MilkStrawberryFatFree,Wed]) :   0.0 :   True
+    minItemConstraint : Size=5, Index=DAYS, Active=True
+        Key : Lower : Body                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              : Upper : Active
+        Fri :   3.0 : selectedItems[StuffedCrustPizza,Fri] + selectedItems[SandwichTurkeyAndCheesePretzel,Fri] + selectedItems[SandwichPbjOnWw,Fri] + selectedItems[Cheeseburger,Fri] + selectedItems[DominosPizza,Fri] + selectedItems[SaladGrilledChickenJrh,Fri] + selectedItems[ChickenDrumstick,Fri] + selectedItems[CornBread,Fri] + selectedItems[SandwichTunaSaladOnSub,Fri] + selectedItems[MiniPancakes,Fri] + selectedItems[SausagePatties,Fri] + selectedItems[SandwichHamAndCheeseOnWw,Fri] + selectedItems[Rotini,Fri] + selectedItems[BeefMeatballs,Fri] + selectedItems[WarmGarlicBread,Fri] + selectedItems[SandwichDeliOnWw,Fri] + selectedItems[FrenchFries,Fri] + selectedItems[ChickenSaladSandwich,Fri] + selectedItems[SoupTomato,Fri] + selectedItems[SweetPotatoCrossTrax,Fri] + selectedItems[SaladTossMenu,Fri] + selectedItems[MixedFruitlightSyrup,Fri] + selectedItems[FreshFruitBasket,Fri] + selectedItems[FruitJuicevariety,Fri] + selectedItems[Broccoli,Fri] + selectedItems[Applesauce,Fri] + selectedItems[HashBrownPatty,Fri] + selectedItems[WarmAppleSlices,Fri] + selectedItems[BeansGreen,Fri] + selectedItems[PeachesInLightSyrup,Fri] + selectedItems[BakedBeans,Fri] + selectedItems[PearsCanLightSyrup,Fri] + selectedItems[MilkChocolateFatFree,Fri] + selectedItems[MilkFatFree,Fri] + selectedItems[Milk1PercentLowfat,Fri] + selectedItems[MilkStrawberryFatFree,Fri] :  +Inf :   True
+        Mon :   3.0 : selectedItems[StuffedCrustPizza,Mon] + selectedItems[SandwichTurkeyAndCheesePretzel,Mon] + selectedItems[SandwichPbjOnWw,Mon] + selectedItems[Cheeseburger,Mon] + selectedItems[DominosPizza,Mon] + selectedItems[SaladGrilledChickenJrh,Mon] + selectedItems[ChickenDrumstick,Mon] + selectedItems[CornBread,Mon] + selectedItems[SandwichTunaSaladOnSub,Mon] + selectedItems[MiniPancakes,Mon] + selectedItems[SausagePatties,Mon] + selectedItems[SandwichHamAndCheeseOnWw,Mon] + selectedItems[Rotini,Mon] + selectedItems[BeefMeatballs,Mon] + selectedItems[WarmGarlicBread,Mon] + selectedItems[SandwichDeliOnWw,Mon] + selectedItems[FrenchFries,Mon] + selectedItems[ChickenSaladSandwich,Mon] + selectedItems[SoupTomato,Mon] + selectedItems[SweetPotatoCrossTrax,Mon] + selectedItems[SaladTossMenu,Mon] + selectedItems[MixedFruitlightSyrup,Mon] + selectedItems[FreshFruitBasket,Mon] + selectedItems[FruitJuicevariety,Mon] + selectedItems[Broccoli,Mon] + selectedItems[Applesauce,Mon] + selectedItems[HashBrownPatty,Mon] + selectedItems[WarmAppleSlices,Mon] + selectedItems[BeansGreen,Mon] + selectedItems[PeachesInLightSyrup,Mon] + selectedItems[BakedBeans,Mon] + selectedItems[PearsCanLightSyrup,Mon] + selectedItems[MilkChocolateFatFree,Mon] + selectedItems[MilkFatFree,Mon] + selectedItems[Milk1PercentLowfat,Mon] + selectedItems[MilkStrawberryFatFree,Mon] :  +Inf :   True
+        Thu :   3.0 : selectedItems[StuffedCrustPizza,Thu] + selectedItems[SandwichTurkeyAndCheesePretzel,Thu] + selectedItems[SandwichPbjOnWw,Thu] + selectedItems[Cheeseburger,Thu] + selectedItems[DominosPizza,Thu] + selectedItems[SaladGrilledChickenJrh,Thu] + selectedItems[ChickenDrumstick,Thu] + selectedItems[CornBread,Thu] + selectedItems[SandwichTunaSaladOnSub,Thu] + selectedItems[MiniPancakes,Thu] + selectedItems[SausagePatties,Thu] + selectedItems[SandwichHamAndCheeseOnWw,Thu] + selectedItems[Rotini,Thu] + selectedItems[BeefMeatballs,Thu] + selectedItems[WarmGarlicBread,Thu] + selectedItems[SandwichDeliOnWw,Thu] + selectedItems[FrenchFries,Thu] + selectedItems[ChickenSaladSandwich,Thu] + selectedItems[SoupTomato,Thu] + selectedItems[SweetPotatoCrossTrax,Thu] + selectedItems[SaladTossMenu,Thu] + selectedItems[MixedFruitlightSyrup,Thu] + selectedItems[FreshFruitBasket,Thu] + selectedItems[FruitJuicevariety,Thu] + selectedItems[Broccoli,Thu] + selectedItems[Applesauce,Thu] + selectedItems[HashBrownPatty,Thu] + selectedItems[WarmAppleSlices,Thu] + selectedItems[BeansGreen,Thu] + selectedItems[PeachesInLightSyrup,Thu] + selectedItems[BakedBeans,Thu] + selectedItems[PearsCanLightSyrup,Thu] + selectedItems[MilkChocolateFatFree,Thu] + selectedItems[MilkFatFree,Thu] + selectedItems[Milk1PercentLowfat,Thu] + selectedItems[MilkStrawberryFatFree,Thu] :  +Inf :   True
+        Tue :   3.0 : selectedItems[StuffedCrustPizza,Tue] + selectedItems[SandwichTurkeyAndCheesePretzel,Tue] + selectedItems[SandwichPbjOnWw,Tue] + selectedItems[Cheeseburger,Tue] + selectedItems[DominosPizza,Tue] + selectedItems[SaladGrilledChickenJrh,Tue] + selectedItems[ChickenDrumstick,Tue] + selectedItems[CornBread,Tue] + selectedItems[SandwichTunaSaladOnSub,Tue] + selectedItems[MiniPancakes,Tue] + selectedItems[SausagePatties,Tue] + selectedItems[SandwichHamAndCheeseOnWw,Tue] + selectedItems[Rotini,Tue] + selectedItems[BeefMeatballs,Tue] + selectedItems[WarmGarlicBread,Tue] + selectedItems[SandwichDeliOnWw,Tue] + selectedItems[FrenchFries,Tue] + selectedItems[ChickenSaladSandwich,Tue] + selectedItems[SoupTomato,Tue] + selectedItems[SweetPotatoCrossTrax,Tue] + selectedItems[SaladTossMenu,Tue] + selectedItems[MixedFruitlightSyrup,Tue] + selectedItems[FreshFruitBasket,Tue] + selectedItems[FruitJuicevariety,Tue] + selectedItems[Broccoli,Tue] + selectedItems[Applesauce,Tue] + selectedItems[HashBrownPatty,Tue] + selectedItems[WarmAppleSlices,Tue] + selectedItems[BeansGreen,Tue] + selectedItems[PeachesInLightSyrup,Tue] + selectedItems[BakedBeans,Tue] + selectedItems[PearsCanLightSyrup,Tue] + selectedItems[MilkChocolateFatFree,Tue] + selectedItems[MilkFatFree,Tue] + selectedItems[Milk1PercentLowfat,Tue] + selectedItems[MilkStrawberryFatFree,Tue] :  +Inf :   True
+        Wed :   3.0 : selectedItems[StuffedCrustPizza,Wed] + selectedItems[SandwichTurkeyAndCheesePretzel,Wed] + selectedItems[SandwichPbjOnWw,Wed] + selectedItems[Cheeseburger,Wed] + selectedItems[DominosPizza,Wed] + selectedItems[SaladGrilledChickenJrh,Wed] + selectedItems[ChickenDrumstick,Wed] + selectedItems[CornBread,Wed] + selectedItems[SandwichTunaSaladOnSub,Wed] + selectedItems[MiniPancakes,Wed] + selectedItems[SausagePatties,Wed] + selectedItems[SandwichHamAndCheeseOnWw,Wed] + selectedItems[Rotini,Wed] + selectedItems[BeefMeatballs,Wed] + selectedItems[WarmGarlicBread,Wed] + selectedItems[SandwichDeliOnWw,Wed] + selectedItems[FrenchFries,Wed] + selectedItems[ChickenSaladSandwich,Wed] + selectedItems[SoupTomato,Wed] + selectedItems[SweetPotatoCrossTrax,Wed] + selectedItems[SaladTossMenu,Wed] + selectedItems[MixedFruitlightSyrup,Wed] + selectedItems[FreshFruitBasket,Wed] + selectedItems[FruitJuicevariety,Wed] + selectedItems[Broccoli,Wed] + selectedItems[Applesauce,Wed] + selectedItems[HashBrownPatty,Wed] + selectedItems[WarmAppleSlices,Wed] + selectedItems[BeansGreen,Wed] + selectedItems[PeachesInLightSyrup,Wed] + selectedItems[BakedBeans,Wed] + selectedItems[PearsCanLightSyrup,Wed] + selectedItems[MilkChocolateFatFree,Wed] + selectedItems[MilkFatFree,Wed] + selectedItems[Milk1PercentLowfat,Wed] + selectedItems[MilkStrawberryFatFree,Wed] :  +Inf :   True
+    minNutrition : Size=5, Index=DAYS, Active=True
+        Key : Lower : Body                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  : Upper : Active
+        Fri : 876.0 : 404*selectedItems[StuffedCrustPizza,Fri] + 263*selectedItems[SandwichTurkeyAndCheesePretzel,Fri] + 409*selectedItems[SandwichPbjOnWw,Fri] + 341*selectedItems[Cheeseburger,Fri] + 300*selectedItems[DominosPizza,Fri] + 426*selectedItems[SaladGrilledChickenJrh,Fri] + 190*selectedItems[ChickenDrumstick,Fri] + 265*selectedItems[CornBread,Fri] + 308*selectedItems[SandwichTunaSaladOnSub,Fri] + 170*selectedItems[MiniPancakes,Fri] + 180*selectedItems[SausagePatties,Fri] + 95*selectedItems[SandwichHamAndCheeseOnWw,Fri] + 143*selectedItems[Rotini,Fri] + 200*selectedItems[BeefMeatballs,Fri] + 140*selectedItems[WarmGarlicBread,Fri] + 187*selectedItems[SandwichDeliOnWw,Fri] + 132*selectedItems[FrenchFries,Fri] + 419*selectedItems[ChickenSaladSandwich,Fri] + 89*selectedItems[SoupTomato,Fri] + 180*selectedItems[SweetPotatoCrossTrax,Fri] + 10*selectedItems[SaladTossMenu,Fri] + 82*selectedItems[MixedFruitlightSyrup,Fri] + 75*selectedItems[FreshFruitBasket,Fri] + 69*selectedItems[FruitJuicevariety,Fri] + 15*selectedItems[Broccoli,Fri] + 114*selectedItems[Applesauce,Fri] + 120*selectedItems[HashBrownPatty,Fri] + 68*selectedItems[WarmAppleSlices,Fri] + 20*selectedItems[BeansGreen,Fri] + 81*selectedItems[PeachesInLightSyrup,Fri] + 128*selectedItems[BakedBeans,Fri] + 86*selectedItems[PearsCanLightSyrup,Fri] + 130*selectedItems[MilkChocolateFatFree,Fri] + 92*selectedItems[MilkFatFree,Fri] + 112*selectedItems[Milk1PercentLowfat,Fri] + 130*selectedItems[MilkStrawberryFatFree,Fri] :  +Inf :   True
+        Mon : 876.0 : 404*selectedItems[StuffedCrustPizza,Mon] + 263*selectedItems[SandwichTurkeyAndCheesePretzel,Mon] + 409*selectedItems[SandwichPbjOnWw,Mon] + 341*selectedItems[Cheeseburger,Mon] + 300*selectedItems[DominosPizza,Mon] + 426*selectedItems[SaladGrilledChickenJrh,Mon] + 190*selectedItems[ChickenDrumstick,Mon] + 265*selectedItems[CornBread,Mon] + 308*selectedItems[SandwichTunaSaladOnSub,Mon] + 170*selectedItems[MiniPancakes,Mon] + 180*selectedItems[SausagePatties,Mon] + 95*selectedItems[SandwichHamAndCheeseOnWw,Mon] + 143*selectedItems[Rotini,Mon] + 200*selectedItems[BeefMeatballs,Mon] + 140*selectedItems[WarmGarlicBread,Mon] + 187*selectedItems[SandwichDeliOnWw,Mon] + 132*selectedItems[FrenchFries,Mon] + 419*selectedItems[ChickenSaladSandwich,Mon] + 89*selectedItems[SoupTomato,Mon] + 180*selectedItems[SweetPotatoCrossTrax,Mon] + 10*selectedItems[SaladTossMenu,Mon] + 82*selectedItems[MixedFruitlightSyrup,Mon] + 75*selectedItems[FreshFruitBasket,Mon] + 69*selectedItems[FruitJuicevariety,Mon] + 15*selectedItems[Broccoli,Mon] + 114*selectedItems[Applesauce,Mon] + 120*selectedItems[HashBrownPatty,Mon] + 68*selectedItems[WarmAppleSlices,Mon] + 20*selectedItems[BeansGreen,Mon] + 81*selectedItems[PeachesInLightSyrup,Mon] + 128*selectedItems[BakedBeans,Mon] + 86*selectedItems[PearsCanLightSyrup,Mon] + 130*selectedItems[MilkChocolateFatFree,Mon] + 92*selectedItems[MilkFatFree,Mon] + 112*selectedItems[Milk1PercentLowfat,Mon] + 130*selectedItems[MilkStrawberryFatFree,Mon] :  +Inf :   True
+        Thu : 876.0 : 404*selectedItems[StuffedCrustPizza,Thu] + 263*selectedItems[SandwichTurkeyAndCheesePretzel,Thu] + 409*selectedItems[SandwichPbjOnWw,Thu] + 341*selectedItems[Cheeseburger,Thu] + 300*selectedItems[DominosPizza,Thu] + 426*selectedItems[SaladGrilledChickenJrh,Thu] + 190*selectedItems[ChickenDrumstick,Thu] + 265*selectedItems[CornBread,Thu] + 308*selectedItems[SandwichTunaSaladOnSub,Thu] + 170*selectedItems[MiniPancakes,Thu] + 180*selectedItems[SausagePatties,Thu] + 95*selectedItems[SandwichHamAndCheeseOnWw,Thu] + 143*selectedItems[Rotini,Thu] + 200*selectedItems[BeefMeatballs,Thu] + 140*selectedItems[WarmGarlicBread,Thu] + 187*selectedItems[SandwichDeliOnWw,Thu] + 132*selectedItems[FrenchFries,Thu] + 419*selectedItems[ChickenSaladSandwich,Thu] + 89*selectedItems[SoupTomato,Thu] + 180*selectedItems[SweetPotatoCrossTrax,Thu] + 10*selectedItems[SaladTossMenu,Thu] + 82*selectedItems[MixedFruitlightSyrup,Thu] + 75*selectedItems[FreshFruitBasket,Thu] + 69*selectedItems[FruitJuicevariety,Thu] + 15*selectedItems[Broccoli,Thu] + 114*selectedItems[Applesauce,Thu] + 120*selectedItems[HashBrownPatty,Thu] + 68*selectedItems[WarmAppleSlices,Thu] + 20*selectedItems[BeansGreen,Thu] + 81*selectedItems[PeachesInLightSyrup,Thu] + 128*selectedItems[BakedBeans,Thu] + 86*selectedItems[PearsCanLightSyrup,Thu] + 130*selectedItems[MilkChocolateFatFree,Thu] + 92*selectedItems[MilkFatFree,Thu] + 112*selectedItems[Milk1PercentLowfat,Thu] + 130*selectedItems[MilkStrawberryFatFree,Thu] :  +Inf :   True
+        Tue : 876.0 : 404*selectedItems[StuffedCrustPizza,Tue] + 263*selectedItems[SandwichTurkeyAndCheesePretzel,Tue] + 409*selectedItems[SandwichPbjOnWw,Tue] + 341*selectedItems[Cheeseburger,Tue] + 300*selectedItems[DominosPizza,Tue] + 426*selectedItems[SaladGrilledChickenJrh,Tue] + 190*selectedItems[ChickenDrumstick,Tue] + 265*selectedItems[CornBread,Tue] + 308*selectedItems[SandwichTunaSaladOnSub,Tue] + 170*selectedItems[MiniPancakes,Tue] + 180*selectedItems[SausagePatties,Tue] + 95*selectedItems[SandwichHamAndCheeseOnWw,Tue] + 143*selectedItems[Rotini,Tue] + 200*selectedItems[BeefMeatballs,Tue] + 140*selectedItems[WarmGarlicBread,Tue] + 187*selectedItems[SandwichDeliOnWw,Tue] + 132*selectedItems[FrenchFries,Tue] + 419*selectedItems[ChickenSaladSandwich,Tue] + 89*selectedItems[SoupTomato,Tue] + 180*selectedItems[SweetPotatoCrossTrax,Tue] + 10*selectedItems[SaladTossMenu,Tue] + 82*selectedItems[MixedFruitlightSyrup,Tue] + 75*selectedItems[FreshFruitBasket,Tue] + 69*selectedItems[FruitJuicevariety,Tue] + 15*selectedItems[Broccoli,Tue] + 114*selectedItems[Applesauce,Tue] + 120*selectedItems[HashBrownPatty,Tue] + 68*selectedItems[WarmAppleSlices,Tue] + 20*selectedItems[BeansGreen,Tue] + 81*selectedItems[PeachesInLightSyrup,Tue] + 128*selectedItems[BakedBeans,Tue] + 86*selectedItems[PearsCanLightSyrup,Tue] + 130*selectedItems[MilkChocolateFatFree,Tue] + 92*selectedItems[MilkFatFree,Tue] + 112*selectedItems[Milk1PercentLowfat,Tue] + 130*selectedItems[MilkStrawberryFatFree,Tue] :  +Inf :   True
+        Wed : 876.0 : 404*selectedItems[StuffedCrustPizza,Wed] + 263*selectedItems[SandwichTurkeyAndCheesePretzel,Wed] + 409*selectedItems[SandwichPbjOnWw,Wed] + 341*selectedItems[Cheeseburger,Wed] + 300*selectedItems[DominosPizza,Wed] + 426*selectedItems[SaladGrilledChickenJrh,Wed] + 190*selectedItems[ChickenDrumstick,Wed] + 265*selectedItems[CornBread,Wed] + 308*selectedItems[SandwichTunaSaladOnSub,Wed] + 170*selectedItems[MiniPancakes,Wed] + 180*selectedItems[SausagePatties,Wed] + 95*selectedItems[SandwichHamAndCheeseOnWw,Wed] + 143*selectedItems[Rotini,Wed] + 200*selectedItems[BeefMeatballs,Wed] + 140*selectedItems[WarmGarlicBread,Wed] + 187*selectedItems[SandwichDeliOnWw,Wed] + 132*selectedItems[FrenchFries,Wed] + 419*selectedItems[ChickenSaladSandwich,Wed] + 89*selectedItems[SoupTomato,Wed] + 180*selectedItems[SweetPotatoCrossTrax,Wed] + 10*selectedItems[SaladTossMenu,Wed] + 82*selectedItems[MixedFruitlightSyrup,Wed] + 75*selectedItems[FreshFruitBasket,Wed] + 69*selectedItems[FruitJuicevariety,Wed] + 15*selectedItems[Broccoli,Wed] + 114*selectedItems[Applesauce,Wed] + 120*selectedItems[HashBrownPatty,Wed] + 68*selectedItems[WarmAppleSlices,Wed] + 20*selectedItems[BeansGreen,Wed] + 81*selectedItems[PeachesInLightSyrup,Wed] + 128*selectedItems[BakedBeans,Wed] + 86*selectedItems[PearsCanLightSyrup,Wed] + 130*selectedItems[MilkChocolateFatFree,Wed] + 92*selectedItems[MilkFatFree,Wed] + 112*selectedItems[Milk1PercentLowfat,Wed] + 130*selectedItems[MilkStrawberryFatFree,Wed] :  +Inf :   True
+
+23 Declarations: DAYS ITEMS TYPES minItemQty minQty maxQty freeQty price course kcal protein calcium fat day minCalories minProtein minCalcium maxFatRatio selectedItems minCost minItemConstraint minNutrition fatRatio
+Model unknown
+
+  Variables:
+    selectedItems : Size=180, Index=ITEMS*DAYS
+        Key                                       : Lower : Value : Upper : Fixed : Stale : Domain
+                            ('Applesauce', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('Applesauce', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('Applesauce', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('Applesauce', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('Applesauce', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('BakedBeans', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('BakedBeans', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('BakedBeans', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('BakedBeans', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('BakedBeans', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('BeansGreen', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('BeansGreen', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('BeansGreen', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('BeansGreen', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('BeansGreen', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                         ('BeefMeatballs', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                         ('BeefMeatballs', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                         ('BeefMeatballs', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                         ('BeefMeatballs', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                         ('BeefMeatballs', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                              ('Broccoli', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                              ('Broccoli', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                              ('Broccoli', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                              ('Broccoli', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                              ('Broccoli', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('Cheeseburger', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('Cheeseburger', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('Cheeseburger', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('Cheeseburger', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('Cheeseburger', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('ChickenDrumstick', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('ChickenDrumstick', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('ChickenDrumstick', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('ChickenDrumstick', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('ChickenDrumstick', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('ChickenSaladSandwich', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('ChickenSaladSandwich', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('ChickenSaladSandwich', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('ChickenSaladSandwich', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('ChickenSaladSandwich', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                             ('CornBread', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                             ('CornBread', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                             ('CornBread', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                             ('CornBread', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                             ('CornBread', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('DominosPizza', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('DominosPizza', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('DominosPizza', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('DominosPizza', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('DominosPizza', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                           ('FrenchFries', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                           ('FrenchFries', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                           ('FrenchFries', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                           ('FrenchFries', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                           ('FrenchFries', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('FreshFruitBasket', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('FreshFruitBasket', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('FreshFruitBasket', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('FreshFruitBasket', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('FreshFruitBasket', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                     ('FruitJuicevariety', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                     ('FruitJuicevariety', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                     ('FruitJuicevariety', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                     ('FruitJuicevariety', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                     ('FruitJuicevariety', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                        ('HashBrownPatty', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                        ('HashBrownPatty', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                        ('HashBrownPatty', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                        ('HashBrownPatty', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                        ('HashBrownPatty', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                    ('Milk1PercentLowfat', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                    ('Milk1PercentLowfat', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                    ('Milk1PercentLowfat', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                    ('Milk1PercentLowfat', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                    ('Milk1PercentLowfat', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('MilkChocolateFatFree', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('MilkChocolateFatFree', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('MilkChocolateFatFree', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('MilkChocolateFatFree', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('MilkChocolateFatFree', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                           ('MilkFatFree', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                           ('MilkFatFree', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                           ('MilkFatFree', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                           ('MilkFatFree', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                           ('MilkFatFree', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                 ('MilkStrawberryFatFree', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                 ('MilkStrawberryFatFree', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                 ('MilkStrawberryFatFree', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                 ('MilkStrawberryFatFree', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                 ('MilkStrawberryFatFree', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('MiniPancakes', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('MiniPancakes', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('MiniPancakes', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('MiniPancakes', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                          ('MiniPancakes', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('MixedFruitlightSyrup', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('MixedFruitlightSyrup', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('MixedFruitlightSyrup', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('MixedFruitlightSyrup', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('MixedFruitlightSyrup', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                   ('PeachesInLightSyrup', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                   ('PeachesInLightSyrup', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                   ('PeachesInLightSyrup', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                   ('PeachesInLightSyrup', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                   ('PeachesInLightSyrup', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                    ('PearsCanLightSyrup', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                    ('PearsCanLightSyrup', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                    ('PearsCanLightSyrup', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                    ('PearsCanLightSyrup', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                    ('PearsCanLightSyrup', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                                ('Rotini', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                                ('Rotini', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                                ('Rotini', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                                ('Rotini', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                                ('Rotini', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                ('SaladGrilledChickenJrh', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                ('SaladGrilledChickenJrh', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                ('SaladGrilledChickenJrh', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                ('SaladGrilledChickenJrh', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                ('SaladGrilledChickenJrh', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                         ('SaladTossMenu', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                         ('SaladTossMenu', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                         ('SaladTossMenu', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                         ('SaladTossMenu', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                         ('SaladTossMenu', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('SandwichDeliOnWw', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('SandwichDeliOnWw', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('SandwichDeliOnWw', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('SandwichDeliOnWw', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                      ('SandwichDeliOnWw', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+              ('SandwichHamAndCheeseOnWw', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+              ('SandwichHamAndCheeseOnWw', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+              ('SandwichHamAndCheeseOnWw', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+              ('SandwichHamAndCheeseOnWw', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+              ('SandwichHamAndCheeseOnWw', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('SandwichPbjOnWw', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('SandwichPbjOnWw', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('SandwichPbjOnWw', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('SandwichPbjOnWw', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('SandwichPbjOnWw', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                ('SandwichTunaSaladOnSub', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                ('SandwichTunaSaladOnSub', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                ('SandwichTunaSaladOnSub', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                ('SandwichTunaSaladOnSub', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                ('SandwichTunaSaladOnSub', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+        ('SandwichTurkeyAndCheesePretzel', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+        ('SandwichTurkeyAndCheesePretzel', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+        ('SandwichTurkeyAndCheesePretzel', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+        ('SandwichTurkeyAndCheesePretzel', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+        ('SandwichTurkeyAndCheesePretzel', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                        ('SausagePatties', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                        ('SausagePatties', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                        ('SausagePatties', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                        ('SausagePatties', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                        ('SausagePatties', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('SoupTomato', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('SoupTomato', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('SoupTomato', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('SoupTomato', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                            ('SoupTomato', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                     ('StuffedCrustPizza', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                     ('StuffedCrustPizza', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                     ('StuffedCrustPizza', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                     ('StuffedCrustPizza', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                     ('StuffedCrustPizza', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                  ('SweetPotatoCrossTrax', 'Fri') :     0 :   5.0 :  None : False : False : NonNegativeIntegers
+                  ('SweetPotatoCrossTrax', 'Mon') :     0 :   5.0 :  None : False : False : NonNegativeIntegers
+                  ('SweetPotatoCrossTrax', 'Thu') :     0 :   5.0 :  None : False : False : NonNegativeIntegers
+                  ('SweetPotatoCrossTrax', 'Tue') :     0 :   5.0 :  None : False : False : NonNegativeIntegers
+                  ('SweetPotatoCrossTrax', 'Wed') :     0 :   5.0 :  None : False : False : NonNegativeIntegers
+                       ('WarmAppleSlices', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('WarmAppleSlices', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('WarmAppleSlices', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('WarmAppleSlices', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('WarmAppleSlices', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('WarmGarlicBread', 'Fri') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('WarmGarlicBread', 'Mon') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('WarmGarlicBread', 'Thu') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('WarmGarlicBread', 'Tue') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+                       ('WarmGarlicBread', 'Wed') :     0 :   0.0 :  None : False : False : NonNegativeIntegers
+
+  Objectives:
+    minCost : Size=1, Index=None, Active=True
+        Key  : Active : Value
+        None :   True :   0.0
+
+  Constraints:
+    minItemConstraint : Size=5
+        Key : Lower : Body : Upper
+        Fri :   3.0 :  5.0 :  None
+        Mon :   3.0 :  5.0 :  None
+        Thu :   3.0 :  5.0 :  None
+        Tue :   3.0 :  5.0 :  None
+        Wed :   3.0 :  5.0 :  None
+    minNutrition : Size=5
+        Key : Lower : Body  : Upper
+        Fri : 876.0 : 900.0 :  None
+        Mon : 876.0 : 900.0 :  None
+        Thu : 876.0 : 900.0 :  None
+        Tue : 876.0 : 900.0 :  None
+        Wed : 876.0 : 900.0 :  None
+    fatRatio : Size=5
+        Key : Lower : Body   : Upper
+        Fri :  None : -765.0 :   0.0
+        Mon :  None : -765.0 :   0.0
+        Thu :  None : -765.0 :   0.0
+        Tue :  None : -765.0 :   0.0
+        Wed :  None : -765.0 :   0.0
+
+Colab paid products - Cancel contracts here
+25
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+26
+24
+39
+40
+41
+21
+22
+23
+19
+20
+16
+17
+18
+15
+12
+13
+14
+9
+10
+11
+7
+8
+4
+5
+6
+1
+2
+3
+42
+Accepting 'product' made 1 additional edits
