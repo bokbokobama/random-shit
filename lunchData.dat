@@ -11,18 +11,17 @@ set ITEMS := StuffedCrustPizza SandwichTurkeyAndCheesePretzel SandwichPbjOnWw Ch
 
 	MilkChocolateFatFree MilkFatFree MilkOnePercentLowFat MilkStrawberryFatFree;
 
-param minItems
-param entreeCost := 2.40
+param minItemQty := 3;
 
-param minCalories := 876
-param minProtein := 52
-param minCalcium := 433
+param minCalories := 876;
+param minProtein := 52;
+param minCalcium := 433;
 param maxFatRatio := 3;
 
-param: 	minQty	maxQty 	freeQty price
+param: 	minQty	maxQty 	freeQty price:=
 entree	1	-1	1	2.40
 side	1	-1	-1	0
-milk	1	-1	1	0.60
+milk	1	-1	1	0.60;
 
 param: 				kcal	protein	calcium	fat	day course:=
 StuffedCrustPizza				404	18	297	17	Mon	entree
@@ -61,5 +60,5 @@ PearsCanLightSyrup				86	0	7	Xxx	0	side
 
 MilkChocolateFatFree			130	8	300	0	All	milk
 MilkFatFree						92	8	306	0	All	milk
-Milk1PercentLowfat				112	8	306	3	All	milk
+MilkOnePercentLowFat				112	8	306	3	All	milk
 MilkStrawberryFatFree			130	8	300	0	Fri	milk;
