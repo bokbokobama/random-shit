@@ -1,15 +1,22 @@
 set DAYS := Mon Tue Wed Thu Fri;
-set TYPES := entree side milk;
-set ITEMS := StuffedCrustPizza SandwichTurkeyAndCheesePretzel SandwichPbjOnWw Cheeseburger DominosPizza
+set COURSES := entree side milk;
+set ENTREES := StuffedCrustPizza SandwichTurkeyAndCheesePretzel SandwichPbjOnWw Cheeseburger DominosPizza
 	SaladGrilledChickenJrh ChickenDrumstick CornBread SandwichTunaSaladOnSub MiniPancakes
 	SausagePatties SandwichHamAndCheeseOnWw Rotini BeefMeatballs WarmGarlicBread SandwichDeliOnWw 
-	FrenchFries ChickenSaladSandwich 
+	FrenchFries ChickenSaladSandwich; 
 
-	SoupTomato SweetPotatoCrossTrax SaladTossMenu MixedFruitlightSyrup FreshFruitBasket
+set SIDES := SoupTomato SweetPotatoCrossTrax SaladTossMenu MixedFruitlightSyrup FreshFruitBasket
 	FruitJuicevariety Broccoli Applesauce HashBrownPatty WarmAppleSlices BeansGreen
-	PeachesInLightSyrup BakedBeans PearsCanLightSyrup
+	PeachesInLightSyrup BakedBeans PearsCanLightSyrup;
 
-	MilkChocolateFatFree MilkFatFree MilkOnePercentLowFat MilkStrawberryFatFree;
+set MILKS := MilkChocolateFatFree MilkFatFree MilkOnePercentLowFat MilkStrawberryFatFree;
+
+set DAILY := SandwichPbjOnWw Cheeseburger DominosPizza SaladGrilledChickenJrh SaladTossMenu FreshFruitBasket FruitJuicevariety MilkChocolateFatFree MilkFatFree MilkOnePercentLowFat;
+set MON := StuffedCrustPizza SandwichTurkeyAndCheesePretzel SoupTomato SweetPotatoCrossTrax MixedFruitlightSyrup;
+set TUE := ChickenDrumstick CornBread SandwichTunaSaladOnSub Broccoli;
+set WED := MiniPancakes SausagePatties SandwichHamAndCheeseOnWw Applesauce HashBrownPatty;
+set THU := Rotini BeefMeatballs WarmGarlicBread SandwichDeliOnWw WarmAppleSlices;
+set FRI := FrenchFries ChickenSaladSandwich BeansGreen PeachesInLightSyrup MilkStrawberryFatFree;
 
 param minItemQty := 3;
 
@@ -24,41 +31,41 @@ side	1	-1	-1	0
 milk	1	-1	1	0.60;
 
 param: 				kcal	protein	calcium	fat	day course:=
-StuffedCrustPizza				404	18	297	17	Mon	entree
+StuffedCrustPizza		404	18	297	17	Mon	entree
 SandwichTurkeyAndCheesePretzel	263	19	100	8	Mon	entree
-SandwichPbjOnWw					409	14	0	32	All	entree
-Cheeseburger					341	21	126	15	All	entree	
-DominosPizza					300	21	500	8	All	entree
-SaladGrilledChickenJrh			426	24	126	8	All	entree
-ChickenDrumstick				190	16	20	11	Tue	entree
-CornBread						265	3	38	7	Tue	entree
-SandwichTunaSaladOnSub			308	25	130	9	Tue	entree
-MiniPancakes					170	4	50	3	Wed	entree
-SausagePatties					180	12	24	14	Wed	entree
-SandwichHamAndCheeseOnWw		95	10	82	6	Wed	entree
-Rotini							143	6	22	3	Thu	entree
-BeefMeatballs					200	15	35	13	Thu	entree
-WarmGarlicBread					140	5	0	4	Thu	entree
-SandwichDeliOnWw				187	7	80	16	Thu	entree
-FrenchFries						132	2	0	5	Fri	entree
-ChickenSaladSandwich			419	21	121	18	Fri	entree
+SandwichPbjOnWw			409	14	0	32	All	entree
+Cheeseburger			341	21	126	15	All	entree	
+DominosPizza			300	21	500	8	All	entree
+SaladGrilledChickenJrh		426	24	126	8	All	entree
+ChickenDrumstick		190	16	20	11	Tue	entree
+CornBread			265	3	38	7	Tue	entree
+SandwichTunaSaladOnSub		308	25	130	9	Tue	entree
+MiniPancakes			170	4	50	3	Wed	entree
+SausagePatties			180	12	24	14	Wed	entree
+SandwichHamAndCheeseOnWw	95	10	82	6	Wed	entree
+Rotini				143	6	22	3	Thu	entree
+BeefMeatballs			200	15	35	13	Thu	entree
+WarmGarlicBread			140	5	0	4	Thu	entree
+SandwichDeliOnWw		187	7	80	16	Thu	entree
+FrenchFries			132	2	0	5	Fri	entree
+ChickenSaladSandwich		419	21	121	18	Fri	entree
 
-SoupTomato						89	2	5	0	Mon	side
-SweetPotatoCrossTrax			180	1	20	9	Mon	side
-SaladTossMenu					10	1	14	0	All	side
-MixedFruitlightSyrup			82	1	7	0	Mon	side
-FreshFruitBasket				75	1	16	0	All	side
-FruitJuicevariety				69	0	0	0	All	side
-Broccoli						15	1	21	0	Tue	side
-Applesauce						114	1	76	0	Wed	side
-HashBrownPatty					120	2	0	7	Wed	side
-WarmAppleSlices					68	0	3	0	Thu	side
-BeansGreen						20	1	33	0	Fri	side
-PeachesInLightSyrup				81	1	5	0	Fri	side
-BakedBeans						128	7	39	Xxx	0	side
-PearsCanLightSyrup				86	0	7	Xxx	0	side
+SoupTomato			89	2	5	0	Mon	side
+SweetPotatoCrossTrax		180	1	20	9	Mon	side
+SaladTossMenu			10	1	14	0	All	side
+MixedFruitlightSyrup		82	1	7	0	Mon	side
+FreshFruitBasket		75	1	16	0	All	side
+FruitJuicevariety		69	0	0	0	All	side
+Broccoli			15	1	21	0	Tue	side
+Applesauce			114	1	76	0	Wed	side
+HashBrownPatty			120	2	0	7	Wed	side
+WarmAppleSlices			68	0	3	0	Thu	side
+BeansGreen			20	1	33	0	Fri	side
+PeachesInLightSyrup		81	1	5	0	Fri	side
+BakedBeans			128	7	39	0	Xxx	side
+PearsCanLightSyrup		86	0	7	0	Xxx	side
 
-MilkChocolateFatFree			130	8	300	0	All	milk
-MilkFatFree						92	8	306	0	All	milk
-MilkOnePercentLowFat				112	8	306	3	All	milk
-MilkStrawberryFatFree			130	8	300	0	Fri	milk;
+MilkChocolateFatFree		130	8	300	0	All	milk
+MilkFatFree			92	8	306	0	All	milk
+MilkOnePercentLowFat		112	8	306	3	All	milk
+MilkStrawberryFatFree		130	8	300	0	Fri	milk;
