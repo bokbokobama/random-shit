@@ -11,18 +11,16 @@ set SIDES := SoupTomato SweetPotatoCrossTrax SaladTossMenu MixedFruitlightSyrup 
 
 set MILKS := MilkChocolateFatFree MilkFatFree MilkOnePercentLowFat MilkStrawberryFatFree;
 
-set NUTRITION := kcal fat;
+set NUTRITION := kcal protein calcium fat;
 
-param minItemQty := 3;
-
-param minCalories := 800;
-param minProtein := 40;
-param minCalcium := 350;
-param maxFatRatio := 3;
+param minCalories := 600;
+param minProtein := 11.3;
+param minCalcium := 433;
+param maxFatRatio := 35;
 
 param: 	minQty	maxQty 	freeQty price:=
 entree	1	-1	1	2.40
-side	1	-1	-1	0.50
+side	1	-1	2	0
 milk	1	-1	1	0.60;
 
 param:				kcal	protein	calcium	fat	course	Mon	Tue	Wed	Thu	Fri:=
