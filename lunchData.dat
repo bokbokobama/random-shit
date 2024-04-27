@@ -1,64 +1,91 @@
-set DAYS := Mon Tue Wed Thu Fri;
-set COURSES := entree side milk;
-set ENTREES := StuffedCrustPizza SandwichTurkeyAndCheesePretzel SandwichPbjOnWw Cheeseburger DominosPizza
-	SaladGrilledChickenJrh ChickenDrumstick CornBread SandwichTunaSaladOnSub MiniPancakes
-	SausagePatties SandwichHamAndCheeseOnWw Rotini BeefMeatballs WarmGarlicBread SandwichDeliOnWw 
-	FrenchFries ChickenSaladSandwich; 
+set DAYS := 	  Mon Tue Wed Thu Fri;
+set COURSES :=  entree side milk cond;
 
-set SIDES := SoupTomato SweetPotatoCrossTrax SaladTossMenu MixedFruitlightSyrup FreshFruitBasket
-	FruitJuicevariety Broccoli Applesauce HashBrownPatty WarmAppleSlices BeansGreen
-	PeachesInLightSyrup BakedBeans PearsCanLightSyrup;
+set ENTREES := 	BakedPastaWithMeatsauceSec BuffaloChickenPizza CheeseburgerOnBun ChickenAlfredo ChickenPopcornSmackers
+		DominosPizza FluffyRice GarlicKnotRoll NachoChipTacos PastaSalad SaladGrilledChicken
+		SandwichDeliOnWW SandwichHamAndCheeseOnWW SandwichPBJOnWW SandwichTunaSaladOnSub SandwichHamAndCheeseOnPretzel
+		SeasonedRice WarmBreadStick WhiteGarlicpizza WholegrainBiscuit WrapTurkeyWrap; 
 
-set MILKS := MilkChocolateFatFree MilkFatFree MilkOnePercentLowFat MilkStrawberryFatFree;
+set SIDES := 	ApplesauceCup BabyCarrotsFresh BeansGreen Broccoli FreshFruitBasket FruitJuiceVariety
+		HoneyGlazedBabyCarrots MixedFruitLightSyrup PeachesInLightSyrup PeachesFrozen PearsCanLightSyrup
+		PeasFrozen RefriedBeans SaladTossMenu SweetPotatoFries;
 
-set NUTRITION := kcal protein calcium fat;
+set MILKS := 	MilkChocolateFF MilkFatFree Milk1PctLowfat;
 
-param minCalories := 600;
-param minProtein := 11.3;
-param minCalcium := 433;
-param maxFatRatio := 35;
+set CONDS :=	BBQSauce CheeseCheddarShredded Ketchup LettuceShredded Mayonnaise Mustard
+		PickleRelish PromisePCs SaladDressingAssorted SaladdressingsPCs Salsa TacoSaucePC;
 
-param: 	minQty	maxQty 	freeQty price:=
-entree	1	-1	1	2.40
-side	1	-1	2	0
-milk	1	-1	1	0.60;
+set NUTRITION := kcal fat protein carbs calcium fiber;
 
-param:				kcal	protein	calcium	fat	course	Mon	Tue	Wed	Thu	Fri:=
-StuffedCrustPizza		404	18	297	17	entree	1	0	0	0	0
-SandwichTurkeyAndCheesePretzel	263	19	100	8	entree	1	0	0	0	0
-SandwichPbjOnWw			409	14	0	32	entree	1	1	1	1	1
-Cheeseburger			341	21	126	15	entree	1	1	1	1	1
-DominosPizza			300	21	500	8	entree	1	1	1	1	1
-SaladGrilledChickenJrh		426	24	126	8	entree	1	1	1	1	1
-ChickenDrumstick		190	16	20	11	entree	0	1	0	0	0
-CornBread			265	3	38	7	entree	0	1	0	0	0
-SandwichTunaSaladOnSub		308	25	130	9	entree	0	1	0	0	0
-MiniPancakes			170	4	50	3	entree	0	0	1	0	0
-SausagePatties			180	12	24	14	entree	0	0	1	0	0
-SandwichHamAndCheeseOnWw	95	10	82	6	entree	0	0	1	0	0
-Rotini				143	6	22	3	entree	0	0	0	1	0
-BeefMeatballs			200	15	35	13	entree	0	0	0	1	0
-WarmGarlicBread			140	5	0	4	entree	0	0	0	1	0
-SandwichDeliOnWw		187	7	80	16	entree	0	0	0	1	0
-FrenchFries			132	2	0	5	entree	0	0	0	0	1
-ChickenSaladSandwich		419	21	121	18	entree	0	0	0	0	1
+# Nutritional requirements from https://www.nal.usda.gov/human-nutrition-and-food-safety/dri-calculator/results
+# given sex M, age 14, ht 5'10", activity level active
+# assuming lunch provides 40% of daily nutrition
+param:   minNut maxNut:=
+kcal    910     91690
+fat     36      950
+protein 15    	9970
+carbs   145     9210
+calcium 520     91500
+fiber   12      9923;
 
-SoupTomato			89	2	5	0	side	1	0	0	0	0
-SweetPotatoCrossTrax		180	1	20	9	side	1	0	0	0	0
-SaladTossMenu			10	1	14	0	side	1	1	1	1	1
-MixedFruitlightSyrup		82	1	7	0	side	1	0	0	0	0
-FreshFruitBasket		75	1	16	0	side	1	1	1	1	1
-FruitJuicevariety		69	0	0	0	side	1	1	1	1	1
-Broccoli			15	1	21	0	side	0	1	0	0	0
-Applesauce			114	1	76	0	side	0	0	1	0	0
-HashBrownPatty			120	2	0	7	side	0	0	1	0	0
-WarmAppleSlices			68	0	3	0	side	0	0	0	1	0
-BeansGreen			20	1	33	0	side	0	0	0	0	1
-PeachesInLightSyrup		81	1	5	0	side	0	0	0	0	1
-BakedBeans			128	7	39	0	side	0	0	0	0	0
-PearsCanLightSyrup		86	0	7	0	side	0	0	0	0	0
+param: 	minQty	maxQty 	freeQty itemQty price:=
+entree	1	99	1	1 	2.40
+side	1	99	1	2 	1.25
+milk	1	3	1	99 	0.65
+cond	0	3	1	1 	0;
 
-MilkChocolateFatFree		130	8	300	0	milk	1	1	1	1	1
-MilkFatFree			92	8	306	0	milk	1	1	1	1	1
-MilkOnePercentLowFat		112	8	306	3	milk	1	1	1	1	1
-MilkStrawberryFatFree		130	8	300	0	milk	0	0	0	0	1;
+param:				kcal	fat	protein	carbs	calcium	fiber	course	Mon	Tue	Wed	Thu	Fri:=
+BakedPastaWithMeatsauceSec	396	10	27	48	293	9	entree	0	0	0	0	1
+BuffaloChickenPizza		428	21	20	40	235	2	entree	0	0	0	1	0
+CheeseburgerOnBun		341	15	21	31	126	3	entree	1	1	1	1	1
+ChickenAlfredo			410	18	27	38	430	3	entree	0	1	0	0	0
+ChickenPopcornSmackers		269	13	18	20	17	3	entree	1	0	0	0	0
+DominosPizza			300	8	21	38	500	4	entree	1	1	1	1	1
+FluffyRice			195	4	4	34	5	2	entree	1	0	0	0	0
+GarlicKnotRoll			170	7	4	23	20	2	entree	0	1	0	0	0
+NachoChipTacos			256	12	15	23	0	4	entree	0	0	1	0	0
+PastaSalad			75	5	3	6	67	1	entree	0	0	0	1	0
+SaladGrilledChicken		426	8	24	61	126	8	entree	1	1	1	1	1
+SandwichDeliOnWW		327	18	13	30	120	4	entree	1	0	0	0	0
+SandwichHamAndCheeseOnWW	235	8	16	28	122	4	entree	0	1	0	0	0
+SandwichPBJOnWW			549	34	20	39	40	8	entree	1	1	1	1	1
+SandwichTunaSaladOnSub		308	9	25	33	130	4	entree	0	0	0	0	1
+SandwichHamAndCheeseOnPretzel	255	8	15	31	102	3	entree	0	0	1	0	0
+SeasonedRice			201	7	3	31	1	2	entree	0	0	1	0	0
+WarmBreadStick			150	5	4	24	20	2	entree	0	0	0	0	1
+WhiteGarlicpizza		503	28	21	41	416	2	entree	0	0	0	1	0
+WholegrainBiscuit		169	6	4	23	33	3	entree	1	0	0	0	0
+WrapTurkeyWrap			314	11	17	42	179	6	entree	0	0	0	1	0
+
+ApplesauceCup			2	0	0	1	0	0	side	1	0	0	0	0
+BabyCarrotsFresh		33	0	1	8	19	3	side	0	0	1	0	0
+BeansGreen			20	0	1	4	33	2	side	0	0	0	0	1
+Broccoli			15	0	1	3	21	1	side	0	1	0	0	0
+FreshFruitBasket		75	0	1	19	16	3	side	1	1	1	1	1
+FruitJuiceVariety		69	0	0	16	0	0	side	1	1	1	1	1
+HoneyGlazedBabyCarrots		60	3	1	8	20	3	side	0	0	0	1	0
+MixedFruitLightSyrup		82	0	1	21	7	2	side	0	0	1	0	0
+PeachesInLightSyrup		81	0	1	22	5	2	side	0	0	0	0	1
+PeachesFrozen			118	0	1	30	4	2	side	0	1	0	0	0
+PearsCanLightSyrup		86	0	0	23	7	2	side	0	0	0	1	0
+PeasFrozen			71	0	5	13	22	4	side	1	0	0	0	0
+RefriedBeans			127	4	5	17	3291	6	side	0	0	1	0	0
+SaladTossMenu			10	0	1	2	14	1	side	1	1	1	1	1
+SweetPotatoFries		164	7	1	24	21	2	side	0	0	0	1	0
+
+MilkChocolateFF			130	0	8	23	300	0	milk	1	1	1	1	1
+MilkFatFree			92	0	8	13	306	0	milk	1	1	1	1	1
+Milk1PctLowfat			112	3	8	13	306	0	milk	1	1	1	1	1
+
+BBQSauce			94	2	0	19	0	0	cond	1	0	0	0	0
+CheeseCheddarShredded		22	2	1	0	40	0	cond	0	0	1	0	0
+Ketchup				10	0	0	3	0	0	cond	1	1	1	1	1
+LettuceShredded			1	0	0	0	2	0	cond	0	0	1	0	0
+Mayonnaise			76	8	0	1	0	0	cond	1	1	1	1	1
+Mustard				5	0	0	1	0	0	cond	1	1	1	1	1
+PickleRelish			1	0	0	0	0	0	cond	1	1	1	1	1
+PromisePCs			3	0	0	0	0	0	cond	1	1	0	0	0
+SaladDressingAssorted		99	9	1	2	11	0	cond	1	1	1	1	1
+SaladdressingsPCs		74	5	1	5	12	0	cond	1	1	1	1	1
+Salsa				0	0	0	0	0	0	cond	0	0	1	0	0
+TacoSaucePC			16	0	0	3	0	0	cond	0	0	1	0	0;
